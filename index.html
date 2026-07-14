@@ -1,0 +1,1062 @@
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<title>smarTree — 학술채용 트리 탐색</title>
+<style>
+  :root{
+    /* 수목원 라이트 — 브랜드 녹색 기운을 머금은 뉴트럴 3단(페이지→패널→인셋) */
+    --paper:#F2F5F0; --panel:#FFFFFF; --panel2:#F8FAF7;
+    --ink:#1F2823; --sub:#67716A;
+    --line:#DFE5DD; --line-soft:#EAEFE8;
+    --accent:#245A49; --accent-soft:#E2EEE7; --accent-ink:#17402F;
+    --inc:#2E7D4F; --inc-soft:#E1F1E5;
+    --exc:#BA4338; --exc-soft:#F9E9E6;
+    --warn:#A2761C; --warn-soft:#F7EED8;
+    --crit:#BA4338; --crit-soft:#F9E9E6;
+    --arch:#8B948E; --arch-soft:#EAEDE9;
+    --radius:14px; --radius-s:9px;
+    --shadow-1:0 1px 2px rgba(23,42,35,.05), 0 6px 20px -10px rgba(23,42,35,.12);
+    --shadow-2:0 4px 10px rgba(23,42,35,.07), 0 20px 36px -16px rgba(23,42,35,.20);
+    --header-bg:linear-gradient(115deg,#E7F0E9 0%,rgba(255,255,255,.88) 46%,rgba(255,255,255,.86) 100%);
+    --tree-dot:rgba(36,90,73,.10);
+    --wm-g1:#3E9163; --wm-g2:#1B4636;
+    --sans:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,sans-serif;
+    --serif:"Nanum Myeongjo","Apple Myungjo","AppleMyungjo",Batang,serif;
+  }
+  /* 수목원 다크 — 침엽수림의 밤: 저채도 녹색 흑, 브랜드 그린은 밝게 보정 */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#121714; --panel:#1B221E; --panel2:#171D1A;
+      --ink:#E5EAE4; --sub:#96A099;
+      --line:#2B342E; --line-soft:#232B26;
+      --accent:#4E9C82; --accent-soft:#20362E; --accent-ink:#A9D7C4;
+      --inc:#5CB47E; --inc-soft:#1E3527;
+      --exc:#E0796D; --exc-soft:#3C2420;
+      --warn:#D3A24A; --warn-soft:#37301C;
+      --crit:#E0796D; --crit-soft:#3C2420;
+      --arch:#7E8781; --arch-soft:#252B27;
+      --shadow-1:0 1px 2px rgba(0,0,0,.35), 0 8px 22px -10px rgba(0,0,0,.5);
+      --shadow-2:0 6px 14px rgba(0,0,0,.4), 0 24px 40px -16px rgba(0,0,0,.55);
+      --header-bg:linear-gradient(115deg,#1A2620 0%,rgba(23,29,26,.9) 46%,rgba(23,29,26,.88) 100%);
+      --tree-dot:rgba(126,178,158,.13);
+      --wm-g1:#6BC49B; --wm-g2:#3E8A6E;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121714; --panel:#1B221E; --panel2:#171D1A;
+    --ink:#E5EAE4; --sub:#96A099;
+    --line:#2B342E; --line-soft:#232B26;
+    --accent:#4E9C82; --accent-soft:#20362E; --accent-ink:#A9D7C4;
+    --inc:#5CB47E; --inc-soft:#1E3527;
+    --exc:#E0796D; --exc-soft:#3C2420;
+    --warn:#D3A24A; --warn-soft:#37301C;
+    --crit:#E0796D; --crit-soft:#3C2420;
+    --arch:#7E8781; --arch-soft:#252B27;
+    --shadow-1:0 1px 2px rgba(0,0,0,.35), 0 8px 22px -10px rgba(0,0,0,.5);
+    --shadow-2:0 6px 14px rgba(0,0,0,.4), 0 24px 40px -16px rgba(0,0,0,.55);
+    --header-bg:linear-gradient(115deg,#1A2620 0%,rgba(23,29,26,.9) 46%,rgba(23,29,26,.88) 100%);
+    --tree-dot:rgba(126,178,158,.13);
+    --wm-g1:#6BC49B; --wm-g2:#3E8A6E;
+  }
+  :root[data-theme="light"]{
+    --paper:#F2F5F0; --panel:#FFFFFF; --panel2:#F8FAF7;
+    --ink:#1F2823; --sub:#67716A;
+    --line:#DFE5DD; --line-soft:#EAEFE8;
+    --accent:#245A49; --accent-soft:#E2EEE7; --accent-ink:#17402F;
+    --inc:#2E7D4F; --inc-soft:#E1F1E5;
+    --exc:#BA4338; --exc-soft:#F9E9E6;
+    --warn:#A2761C; --warn-soft:#F7EED8;
+    --crit:#BA4338; --crit-soft:#F9E9E6;
+    --arch:#8B948E; --arch-soft:#EAEDE9;
+    --shadow-1:0 1px 2px rgba(23,42,35,.05), 0 6px 20px -10px rgba(23,42,35,.12);
+    --shadow-2:0 4px 10px rgba(23,42,35,.07), 0 20px 36px -16px rgba(23,42,35,.20);
+    --header-bg:linear-gradient(115deg,#E7F0E9 0%,rgba(255,255,255,.88) 46%,rgba(255,255,255,.86) 100%);
+    --tree-dot:rgba(36,90,73,.10);
+    --wm-g1:#3E9163; --wm-g2:#1B4636;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper)}
+  body{font-family:var(--sans);color:var(--ink);font-size:14.5px;line-height:1.55;
+       -webkit-font-smoothing:antialiased;padding-bottom:76px}
+  button{font-family:inherit;cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ── header / smarTree 브랜드 (스티키 + 블러) ── */
+  header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+         padding:16px 28px 14px;border-bottom:1px solid var(--line-soft);
+         background:var(--header-bg);
+         position:sticky;top:0;z-index:30;
+         -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logomark{filter:drop-shadow(0 2px 4px rgba(44,94,79,.3));flex-shrink:0}
+  .logomark path{stroke:var(--accent)}
+  .wordmark{font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--ink)}
+  .wordmark .wm-tree{background:linear-gradient(135deg,var(--wm-g1) 0%,var(--wm-g2) 100%);
+                     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .wm-sub{font-size:9.5px;font-weight:700;letter-spacing:.34em;color:var(--sub);margin-top:4px}
+  .tagline{color:var(--sub);font-size:13px}
+  .hstats{margin-left:auto;display:flex;gap:16px;font-size:12.5px;color:var(--sub);align-items:center}
+  .hstats b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px}
+  #themeBtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+    background:var(--panel);font-size:15px;line-height:1;display:grid;place-items:center;
+    cursor:pointer;transition:transform .18s ease}
+  #themeBtn:hover{transform:rotate(20deg) scale(1.1)}
+
+  /* ── layout ─────────────────────────── */
+  main{display:grid;grid-template-columns:minmax(360px,430px) 1fr;gap:24px;
+       padding:24px 28px;max-width:1440px;margin:0 auto}
+  .panel{background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
+         box-shadow:var(--shadow-1)}
+
+  /* ── tree panel ─────────────────────── */
+  #treePanel{padding:16px 8px 16px 16px;align-self:start;position:sticky;top:88px}
+  .panel-label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--sub);
+               text-transform:uppercase;padding:0 8px 4px}
+  .tree-hint{font-size:12px;color:var(--sub);padding:0 8px 10px;border-bottom:1px solid var(--line-soft);margin-bottom:6px}
+  #treeScroll{overflow:auto;max-height:calc(100vh - 270px);border-radius:10px;
+              background-image:radial-gradient(var(--tree-dot) 1.1px, transparent 1.1px);
+              background-size:20px 20px}   /* 도트 그리드 = 조작 가능한 캔버스라는 신호 */
+  #treeSvg{touch-action:none}
+  #treeSvg text{font-family:var(--sans);user-select:none;-webkit-user-select:none}
+  /* 라벨: 테마 대응 기본색 + 배경(도트 그리드) 위 가독성을 위한 헤일로 */
+  #treeSvg .nlabel{fill:var(--ink);
+    paint-order:stroke;stroke:var(--panel);stroke-width:3px;
+    stroke-linejoin:round;stroke-linecap:round}
+  #treeSvg .toggle circle{fill:var(--panel)}
+  #treeSvg g.node{cursor:grab}
+  #treeSvg g.node:active{cursor:grabbing}
+  #treeSvg g.node .bubble{filter:drop-shadow(0 1.5px 2.5px rgba(0,0,0,.18));
+    transition:filter .16s ease}                /* 크기 변화는 물리 루프가 담당 */
+  #treeSvg g.node .bcnt{pointer-events:none}
+  #treeSvg g.node:hover .bubble{filter:drop-shadow(0 4px 9px rgba(0,0,0,.3))}
+  #treeSvg g.node:hover .nlabel{font-weight:700}
+  #treeSvg .toggle{cursor:pointer}
+  #treeSvg g.dim{opacity:.35}
+
+  /* ── filter deck ────────────────────── */
+  #filterDeck{padding:16px 18px 14px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+  .deck-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .deck-row input[type=search]{flex:1;min-width:180px;padding:9px 13px;border:1px solid var(--line);
+    border-radius:var(--radius-s);font-family:inherit;font-size:13.5px;background:var(--panel2);color:var(--ink);
+    transition:border-color .15s, box-shadow .15s}
+  .deck-row input[type=search]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .deck-row select{padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius-s);
+    font-family:inherit;font-size:13px;background:var(--panel2);color:var(--ink)}
+  .skill-legend{font-size:12px;color:var(--sub)}
+  .skill-legend .k{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;margin:0 2px}
+  .skill-legend .k.inc{background:var(--inc-soft);color:var(--inc);border:1px solid var(--inc)}
+  .skill-legend .k.exc{background:var(--exc-soft);color:var(--exc);border:1px solid var(--exc);text-decoration:line-through}
+  #chipCloud{display:flex;flex-wrap:wrap;gap:6px;max-height:118px;overflow:auto;padding:2px}
+  .chip{border:1px solid var(--line);background:var(--panel2);border-radius:20px;
+        padding:4px 12px;font-size:12.5px;color:var(--ink);transition:background .12s,border-color .12s,transform .12s}
+  .chip:hover{transform:translateY(-1px)}
+  .chip .cnt{color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums;margin-left:3px}
+  .chip.inc{background:var(--inc-soft);border-color:var(--inc);color:var(--inc);font-weight:600}
+  .chip.inc::before{content:"+ "}
+  .chip.exc{background:var(--exc-soft);border-color:var(--exc);color:var(--exc);text-decoration:line-through}
+  .chip.exc::before{content:"− "}
+  @media (prefers-reduced-motion:no-preference){ .chip:hover{border-color:var(--sub)} }
+
+  /* active filter summary */
+  #activeBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;min-height:28px}
+  #activeBar .count{font-size:13px;color:var(--sub);margin-right:4px}
+  #activeBar .count b{color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+  .fchip{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:2.5px 6px 2.5px 10px;
+         font-size:12px;border:1px solid var(--line);background:var(--panel)}
+  .fchip button{border:0;background:none;color:inherit;font-size:13px;line-height:1;padding:0 2px;opacity:.65}
+  .fchip button:hover{opacity:1}
+  .fchip.path{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+  .fchip.inc{background:var(--inc-soft);border-color:var(--inc);color:var(--inc)}
+  .fchip.exc{background:var(--exc-soft);border-color:var(--exc);color:var(--exc)}
+  #resetBtn{border:0;background:none;color:var(--sub);font-size:12px;text-decoration:underline;margin-left:4px}
+
+  /* ── cards ──────────────────────────── */
+  #cards{display:flex;flex-direction:column;gap:12px}
+  .card{position:relative;background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
+        padding:17px 19px 15px 23px;overflow:hidden;box-shadow:var(--shadow-1);
+        transition:transform .18s ease, box-shadow .18s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--bc,var(--accent))}
+  .card-top{display:flex;gap:10px;align-items:flex-start}
+  .card h3{font-size:16.5px;font-weight:700;line-height:1.38;text-wrap:balance;flex:1;letter-spacing:-.01em}
+  .card h3 a{color:inherit;text-decoration:none}
+  .card h3 a:hover{color:var(--accent-ink);text-decoration:underline}
+  .card .ext{font-size:11px;color:var(--sub);margin-left:4px;text-decoration:none;display:inline-block}
+  .card .meta{font-size:12.5px;color:var(--sub);margin-top:3px}
+  .card .meta b{color:var(--ink);font-weight:600}
+  .badges{display:flex;gap:6px;flex-shrink:0;align-items:center}
+  .dday{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
+        padding:2px 9px;border-radius:20px;background:var(--line-soft);color:var(--sub);white-space:nowrap}
+  .dday.warn{background:var(--warn-soft);color:var(--warn)}
+  .dday.crit{background:var(--crit-soft);color:var(--crit)}
+  .dday.arch{background:var(--arch-soft);color:var(--arch)}
+  .card.archived{opacity:.82}
+  .card.archived h3{color:var(--sub)}
+  .rank{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:20px;
+        background:var(--accent-soft);color:var(--accent-ink);white-space:nowrap}
+  .skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;align-items:center}
+  .sk{font-size:11.5px;padding:2px 9px;border-radius:6px;background:var(--paper);
+      border:1px solid var(--line);color:var(--ink)}
+  .sk.hit{background:var(--inc-soft);border-color:var(--inc);color:var(--inc);font-weight:600}
+  .sk.pref{border-style:dashed;color:var(--sub);background:var(--panel)}
+  .sk-label{font-size:11px;color:var(--sub);margin:0 2px 0 6px}
+  .card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;
+             padding-top:10px;border-top:1px solid var(--line-soft)}
+  .salary{font-size:12.5px;color:var(--sub)}
+  .match{font-size:12px;font-weight:700;color:var(--inc);font-variant-numeric:tabular-nums}
+  .cmp-toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub);
+              border:1px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--panel)}
+  .cmp-toggle input{accent-color:var(--accent)}
+  .cmp-toggle.on{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft);font-weight:600}
+  .empty{padding:60px 20px;text-align:center;color:var(--sub);background:var(--panel);
+         border:1px dashed var(--line);border-radius:var(--radius)}
+
+  /* ── compare tray ───────────────────── */
+  #tray{position:fixed;left:0;right:0;bottom:0;background:#212824;color:#F1F3EF;
+        display:none;align-items:center;gap:12px;padding:12px 28px;z-index:40;
+        box-shadow:0 -6px 24px rgba(0,0,0,.12)}
+  #tray.show{display:flex}
+  #tray .tlabel{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#B9B6AC;font-weight:700}
+  #trayItems{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+  .titem{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);
+         border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:4px 8px 4px 12px;font-size:12.5px}
+  .titem button{border:0;background:none;color:#F3F2EE;opacity:.6;font-size:14px;padding:0 2px}
+  .titem button:hover{opacity:1}
+  #cmpBtn{background:var(--accent);color:#fff;border:0;border-radius:8px;
+          padding:9px 20px;font-size:13.5px;font-weight:700}
+  #cmpBtn:disabled{opacity:.4;cursor:default}
+
+  /* ── compare overlay ────────────────── */
+  #overlay{position:fixed;inset:0;background:rgba(30,32,35,.55);z-index:50;display:none;
+           align-items:flex-start;justify-content:center;padding:5vh 20px;overflow:auto}
+  #overlay.show{display:flex}
+  #cmpBox{background:var(--panel);border-radius:14px;max-width:960px;width:100%;
+          padding:26px 28px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  #cmpBox h2{font-family:var(--serif);font-size:20px;color:var(--accent-ink);margin-bottom:4px}
+  #cmpBox .sub{font-size:12.5px;color:var(--sub);margin-bottom:16px}
+  .tbl-wrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{padding:8px 12px;border-bottom:1px solid var(--line-soft);text-align:left;vertical-align:top}
+  thead th{font-size:13.5px;font-weight:700;border-bottom:2px solid var(--line);min-width:170px}
+  thead th .org{display:block;font-weight:400;font-size:12px;color:var(--sub)}
+  tbody th{font-weight:600;color:var(--sub);font-size:12px;white-space:nowrap;width:110px}
+  tr.sec th{padding-top:16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
+  td .dot{font-size:15px;line-height:1}
+  td.yes .dot{color:var(--inc)} td.no .dot{color:var(--line)}
+  tr.common td{background:var(--inc-soft)}
+  td .dd{font-variant-numeric:tabular-nums;font-weight:700}
+  #cmpClose{float:right;border:0;background:var(--line-soft);border-radius:8px;
+            width:30px;height:30px;font-size:15px;color:var(--sub)}
+  .cmp-note{font-size:12px;color:var(--sub);margin-top:12px}
+  .cmp-note .sw{display:inline-block;width:10px;height:10px;background:var(--inc-soft);
+                border:1px solid var(--inc);border-radius:2px;vertical-align:-1px;margin-right:4px}
+
+  /* ── PDF ingest demo ────────────────── */
+  #ingestBtn{background:var(--accent);color:#fff;border:0;border-radius:var(--radius-s);
+             padding:8px 15px;font-size:13px;font-weight:700;white-space:nowrap;
+             box-shadow:0 2px 8px -2px rgba(36,90,73,.45);transition:filter .15s, transform .15s}
+  #ingestBtn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  #ingest{position:fixed;inset:0;background:rgba(30,32,35,.55);z-index:60;display:none;
+          align-items:flex-start;justify-content:center;padding:5vh 20px;overflow:auto}
+  #ingest.show{display:flex}
+  #ingestBox{background:var(--panel);border-radius:14px;max-width:640px;width:100%;
+             padding:26px 28px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  #ingestBox h2{font-family:var(--serif);font-size:20px;color:var(--accent-ink);margin-bottom:4px}
+  #ingestBox .steps{font-size:12px;color:var(--sub);margin-bottom:16px}
+  #ingestBox .steps b{color:var(--accent-ink)}
+  #ingClose{float:right;border:0;background:var(--line-soft);border-radius:8px;
+            width:30px;height:30px;font-size:15px;color:var(--sub)}
+  .pdfcard{display:flex;gap:12px;align-items:center;border:1px solid var(--line);
+           border-radius:10px;padding:12px 14px;margin-bottom:12px;background:var(--paper)}
+  .pdfcard .icon{font-size:26px}
+  .pdfcard .name{font-size:13px;font-weight:600}
+  .pdfcard .meta{font-size:11.5px;color:var(--sub)}
+  .pdf-excerpt{font-size:12px;line-height:1.7;color:var(--sub);background:var(--paper);
+               border:1px dashed var(--line);border-radius:8px;padding:12px 14px;
+               margin-bottom:14px;white-space:pre-wrap}
+  .ing-note{font-size:12px;color:var(--sub);margin:10px 0 0}
+  .ing-primary{background:var(--accent);color:#fff;border:0;border-radius:8px;
+               padding:10px 18px;font-size:13.5px;font-weight:700;width:100%}
+  .ing-primary:disabled{opacity:.45;cursor:default}
+  #ingSpinner{text-align:center;padding:36px 0;color:var(--sub);font-size:13.5px}
+  #ingSpinner .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+                   background:var(--accent);margin:0 3px;animation:blink 1s infinite}
+  #ingSpinner .dot:nth-child(2){animation-delay:.2s}
+  #ingSpinner .dot:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .xcard{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .xcard .xtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .xcard h4{font-size:13.5px;font-weight:700}
+  .xcard .xmeta{font-size:12px;color:var(--sub);margin-top:2px}
+  .xpath{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:20px;
+         padding:2px 9px;margin-top:6px}
+  .conf{font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;white-space:nowrap}
+  .conf.high{background:var(--inc-soft);color:var(--inc)}
+  .conf.med{background:var(--warn-soft);color:var(--warn)}
+  .newpill{font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:20px;
+           background:var(--accent);color:#fff;white-space:nowrap}
+  @media (prefers-reduced-motion:reduce){ #ingSpinner .dot{animation:none;opacity:.6} }
+
+  @media (max-width:920px){
+    main{grid-template-columns:1fr}
+    #treePanel{position:static}
+    #treeScroll{max-height:340px}
+    header{padding:16px 18px}
+    main{padding:16px 18px}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<header>
+  <div class="brand">
+    <svg class="logomark" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
+      <defs>
+        <radialGradient id="lgA" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#9CCDB8"/><stop offset="100%" stop-color="#2C5E4F"/>
+        </radialGradient>
+        <radialGradient id="lgB" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#B9DDCC"/><stop offset="100%" stop-color="#3E9163"/>
+        </radialGradient>
+      </defs>
+      <path d="M13,22 C22,22 22,10 32,10 M13,22 C22,22 22,22 32,22 M13,22 C22,22 22,34 32,34"
+            stroke="#2C5E4F" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+      <circle cx="12" cy="22" r="8.5" fill="url(#lgA)"/>
+      <circle cx="33" cy="10" r="5.5" fill="url(#lgB)"/>
+      <circle cx="33" cy="22" r="5.5" fill="url(#lgB)"/>
+      <circle cx="33" cy="34" r="5.5" fill="url(#lgB)"/>
+    </svg>
+    <div>
+      <div class="wordmark">smar<span class="wm-tree">Tree</span></div>
+      <div class="wm-sub">ACADEMIC JOB TREE</div>
+    </div>
+  </div>
+  <div class="tagline">분야의 가지를 따라 내려가면, 내 공고가 보입니다</div>
+  <div class="hstats">
+    <span>진행 중 <b id="statTotal">0</b>건</span>
+    <span>이번 주 마감 <b id="statWeek">0</b>건</span>
+    <span>아카이브 <b id="statArch">0</b>건</span>
+    <button id="themeBtn" aria-label="라이트/다크 테마 전환" title="테마 전환">🌙</button>
+    <button id="ingestBtn">＋ PDF 공고 등록</button>
+  </div>
+</header>
+
+<main>
+  <aside class="panel" id="treePanel">
+    <div class="panel-label">분야 트리</div>
+    <div class="tree-hint">원을 클릭해 분야 선택 — <b>여러 개 동시 선택 가능</b> · 원 안 숫자 = 공고 수 · <b>아카이브</b>를 누르면 연도 → 분야 순으로 펼쳐집니다</div>
+    <div id="treeScroll"><svg id="treeSvg" role="tree" aria-label="분야 트리"></svg></div>
+  </aside>
+
+  <section id="listPanel">
+    <div class="panel" id="filterDeck">
+      <div class="deck-row">
+        <input type="search" id="q" placeholder="기관·제목·스킬 검색  (예: 서울대, 통계)" aria-label="검색">
+        <select id="rankSel" aria-label="직급 필터">
+          <option value="">직급 전체</option>
+          <option>조교수</option><option>연구교수</option><option>박사후연구원</option>
+          <option>연구원</option><option>강의·겸임</option><option>초빙·객원</option>
+        </select>
+        <select id="sortSel" aria-label="정렬">
+          <option value="deadline">마감 임박순</option>
+          <option value="match">스킬 매치순</option>
+          <option value="org">기관명순</option>
+        </select>
+      </div>
+      <div class="skill-legend">
+        스킬 칩을 클릭할 때마다 <span class="k inc">+ 포함</span> → <span class="k exc">− 제외</span> → 해제 순으로 바뀝니다.
+        제외는 <b>필수 요건</b>에만 적용돼요 — 우대 사항은 없어도 지원할 수 있으니까요.
+      </div>
+      <div id="chipCloud" role="group" aria-label="스킬 필터"></div>
+    </div>
+
+    <div id="activeBar"></div>
+    <div id="cards"></div>
+  </section>
+</main>
+
+<div id="tray" aria-live="polite">
+  <span class="tlabel">비교함</span>
+  <div id="trayItems"></div>
+  <button id="cmpBtn" disabled>나란히 비교</button>
+</div>
+
+<div id="overlay" role="dialog" aria-modal="true" aria-label="공고 비교">
+  <div id="cmpBox">
+    <button id="cmpClose" aria-label="닫기">✕</button>
+    <h2>공고 나란히 비교</h2>
+    <div class="sub">스킬 매트릭스에서 ● 는 해당 공고가 그 스킬을 요구·우대함을 뜻합니다.</div>
+    <div class="tbl-wrap" id="cmpTable"></div>
+    <div class="cmp-note"><span class="sw"></span>초록 행 = 선택한 모든 공고가 공통으로 요구하는 스킬</div>
+  </div>
+</div>
+
+<div id="ingest" role="dialog" aria-modal="true" aria-label="PDF 공고 등록">
+  <div id="ingestBox">
+    <button id="ingClose" aria-label="닫기">✕</button>
+    <h2>PDF 공고 등록</h2>
+    <div class="steps"><b>1 업로드</b> → 2 자동 추출 → 3 검수·승인 <span style="opacity:.7">(데모 — 실서비스는 Claude API가 PDF를 구조화 추출)</span></div>
+
+    <div id="ingStep1">
+      <div class="pdfcard">
+        <span class="icon">📄</span>
+        <div>
+          <div class="name">한밭대학교_2026-2학기_전임교원_초빙공고.pdf</div>
+          <div class="meta">3쪽 · 842KB · 여러 분야 일괄 모집 공고</div>
+        </div>
+      </div>
+      <div class="pdf-excerpt">한밭대학교 공고 제2026-131호
+2026학년도 2학기 전임교원(조교수) 공개채용 공고
+
+1. 모집분야
+  가. 컴퓨터공학과 — 인공지능·데이터 전공 1명 (Python, 기계학습 연구실적 필수 / 영어강의 가능자 우대)
+  나. 수리과학과 — 응용통계 전공 1명 (R 및 통계이론 강의 가능자 / 데이터사이언스 교과 개발 우대)
+  다. 산업디자인학과 — 제품디자인 전공 1명 (포트폴리오 제출 / 산업체 경력 우대)
+2. 지원자격: 박사학위 소지자 (임용일 기준)
+3. 접수기간: 2026. 7. 27.(월) ~ 8. 7.(금) 18:00 …</div>
+      <button class="ing-primary" id="ingRun">이 PDF에서 공고 추출하기</button>
+      <p class="ing-note" id="ingDoneNote" hidden>✓ 이 PDF는 이미 반영되었습니다. 목록에서 NEW 배지로 확인할 수 있어요.</p>
+    </div>
+
+    <div id="ingStep2" hidden>
+      <div id="ingSpinner">
+        공고 단위 분리 · 분야 분류 · 스킬 태깅 중<br><br>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </div>
+
+    <div id="ingStep3" hidden>
+      <div id="ingResults"></div>
+      <p class="ing-note" style="margin-bottom:12px">신규 스킬 2개 감지: <b>Machine Learning, 제품디자인</b> — 승인 시 스킬 사전에 추가됩니다.
+      분류 확신도가 낮은 공고는 이렇게 검수 대기로 표시되고, 나머지는 자동 게시할 수 있습니다.</p>
+      <button class="ing-primary" id="ingApprove">3건 승인하고 트리에 반영</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 데이터 ──────────────────────────────────────────── */
+const TREE = { name:"전체 분야", children:[
+  { name:"공학", children:[ {name:"컴퓨터·AI"},{name:"전기·전자"},{name:"기계·항공"},{name:"화학공학·재료"},{name:"토목·건축·도시"} ]},
+  { name:"자연과학", children:[ {name:"수학·통계"},{name:"물리학"},{name:"화학"},{name:"생명과학"},{name:"농림·원예"} ]},
+  { name:"의·약학", children:[ {name:"의학"},{name:"약학"},{name:"간호·보건"} ]},
+  { name:"사회과학", children:[ {name:"경영·경제"},{name:"심리학"},{name:"사회·행정"} ]},
+  { name:"인문학", children:[ {name:"어문학"},{name:"역사·철학"} ]},
+  { name:"예·체능", children:[ {name:"디자인"},{name:"체육"} ]},
+  { name:"융합·학제간", children:[ {name:"AI·데이터 융합"},{name:"환경·지속가능"},{name:"바이오헬스 융합"} ]},
+]};
+const BRANCH = { "공학":"#3E6FC4","자연과학":"#7A5BC9","의·약학":"#C9556E",
+                 "사회과학":"#C98A2E","인문학":"#3E9163","예·체능":"#B85B9E",
+                 "융합·학제간":"#2E8F94","아카이브":"#8A8F94" };
+
+/* 기관 채용·공식 사이트 — 공고 제목 클릭 시 이동 */
+const ORG_URL = {
+  "성균관대학교":"https://www.skku.edu","KAIST":"https://www.kaist.ac.kr",
+  "네이버 AI Lab":"https://recruit.navercorp.com","한양대학교":"https://www.hanyang.ac.kr",
+  "ETRI":"https://www.etri.re.kr","서울대학교":"https://www.snu.ac.kr",
+  "한국항공우주연구원":"https://www.kari.re.kr","POSTECH":"https://www.postech.ac.kr",
+  "고려대학교":"https://www.korea.ac.kr","IBS 기초과학연구원":"https://www.ibs.re.kr",
+  "연세대학교":"https://www.yonsei.ac.kr","한국생명공학연구원":"https://www.kribb.re.kr",
+  "서울아산병원(울산의대)":"https://www.amc.seoul.kr","분당서울대학교병원":"https://www.snubh.org",
+  "이화여자대학교":"https://www.ewha.ac.kr","한국개발연구원(KDI)":"https://www.kdi.re.kr",
+  "중앙대학교":"https://www.cau.ac.kr","서울연구원":"https://www.si.re.kr",
+  "서강대학교":"https://www.sogang.ac.kr","홍익대학교":"https://www.hongik.ac.kr",
+  "용인대학교":"https://www.yiu.ac.kr","한밭대학교":"https://www.hanbat.ac.kr",
+  "서울시립대학교":"https://recruit.uos.ac.kr","경희대학교":"https://www.khu.ac.kr",
+  "UNIST":"https://www.unist.ac.kr","아주대학교":"https://www.ajou.ac.kr",
+};
+
+const JOBS = [
+ {id:1, t:"소프트웨어학과 조교수 초빙 (인공지능 전공)", org:"성균관대학교", f:["공학","컴퓨터·AI"], rank:"조교수", region:"수원", dl:"2026-07-25", pay:"본교 내규", sk:["Python","Deep Learning","NLP"], pf:["영어강의","Top-tier 논문"]},
+ {id:2, t:"AI대학원 박사후연구원 (멀티모달 학습)", org:"KAIST", f:["공학","컴퓨터·AI"], rank:"박사후연구원", region:"대전", dl:"2026-08-10", pay:"연 5,500~6,500만", sk:["Python","PyTorch","Computer Vision"], pf:["대규모 분산학습"]},
+ {id:3, t:"산학협력 AI Lab 연구원", org:"네이버 AI Lab", f:["공학","컴퓨터·AI"], rank:"연구원", region:"성남", dl:"2026-07-31", pay:"회사 내규(협의)", sk:["Python","Deep Learning","대규모 시스템"], pf:["NLP","서비스 배포 경험"]},
+ {id:4, t:"전자공학부 조교수 신규 임용 (아날로그 회로)", org:"한양대학교", f:["공학","전기·전자"], rank:"조교수", region:"서울", dl:"2026-08-20", pay:"본교 내규", sk:["회로설계","MATLAB"], pf:["산업체 경력","영어강의"]},
+ {id:5, t:"차세대 반도체 소자 연구원 채용", org:"ETRI", f:["공학","전기·전자"], rank:"연구원", region:"대전", dl:"2026-07-22", pay:"기관 내규", sk:["반도체공정","Verilog"], pf:["Python"]},
+ {id:6, t:"기계공학부 박사후연구원 (구조해석)", org:"서울대학교", f:["공학","기계·항공"], rank:"박사후연구원", region:"서울", dl:"2026-08-05", pay:"연 5,000만 내외", sk:["CAD","유한요소해석","MATLAB"], pf:["Python"]},
+ {id:7, t:"발사체 유동해석 선임연구원", org:"한국항공우주연구원", f:["공학","기계·항공"], rank:"연구원", region:"대전", dl:"2026-09-01", pay:"기관 내규", sk:["유체역학","CFD","Python"], pf:["병렬계산"]},
+ {id:8, t:"신소재공학과 연구교수 (에너지 소재)", org:"POSTECH", f:["공학","화학공학·재료"], rank:"연구교수", region:"포항", dl:"2026-08-15", pay:"연 6,000만 내외", sk:["재료합성","XRD","전자현미경"], pf:["이차전지 경험"]},
+ {id:9, t:"통계학과 조교수 초빙 (베이지안/인과추론)", org:"성균관대학교", f:["자연과학","수학·통계"], rank:"조교수", region:"서울", dl:"2026-07-30", pay:"본교 내규", sk:["R","통계이론","Python"], pf:["영어강의","인과추론"]},
+ {id:10,t:"수학과 박사후연구원 (해석학)", org:"고려대학교", f:["자연과학","수학·통계"], rank:"박사후연구원", region:"서울", dl:"2026-08-25", pay:"연 4,800만", sk:["해석학","LaTeX"], pf:["편미분방정식"]},
+ {id:11,t:"양자정보 그룹 박사후연구원", org:"IBS 기초과학연구원", f:["자연과학","물리학"], rank:"박사후연구원", region:"대전", dl:"2026-09-10", pay:"연 5,700만~", sk:["양자컴퓨팅","Python"], pf:["초전도 큐비트"]},
+ {id:12,t:"화학과 조교수 신규 임용 (유기화학)", org:"연세대학교", f:["자연과학","화학"], rank:"조교수", region:"서울", dl:"2026-08-30", pay:"본교 내규", sk:["유기합성","NMR"], pf:["촉매 반응 개발"]},
+ {id:13,t:"생명과학부 박사후연구원 (유전체 편집)", org:"서울대학교", f:["자연과학","생명과학"], rank:"박사후연구원", region:"서울", dl:"2026-07-20", pay:"연 5,000만 내외", sk:["세포배양","CRISPR","R"], pf:["단일세포 분석"]},
+ {id:14,t:"감염병 연구센터 연구원", org:"한국생명공학연구원", f:["자연과학","생명과학"], rank:"연구원", region:"대전", dl:"2026-08-12", pay:"기관 내규", sk:["세포배양","유세포분석"], pf:["BSL-3 경험"]},
+ {id:15,t:"임상강사(연구전담) 모집 — 종양내과", org:"서울아산병원(울산의대)", f:["의·약학","의학"], rank:"연구교수", region:"서울", dl:"2026-07-28", pay:"병원 내규", sk:["임상시험","의학통계","R"], pf:["IRB 경험"]},
+ {id:16,t:"의료 AI 연구교수 (영상의학)", org:"분당서울대학교병원", f:["의·약학","의학"], rank:"연구교수", region:"성남", dl:"2026-09-05", pay:"연 7,000만 내외", sk:["의료AI","Python","Deep Learning"], pf:["DICOM","Computer Vision"]},
+ {id:17,t:"약학대학 조교수 초빙 (약물동태학)", org:"이화여자대학교", f:["의·약학","약학"], rank:"조교수", region:"서울", dl:"2026-08-18", pay:"본교 내규", sk:["약물동태학","세포배양"], pf:["모델링 시뮬레이션"]},
+ {id:18,t:"보건대학원 연구교수 (역학)", org:"연세대학교", f:["의·약학","간호·보건"], rank:"연구교수", region:"서울", dl:"2026-08-08", pay:"연 5,500만 내외", sk:["역학","SPSS","R"], pf:["코호트 연구"]},
+ {id:19,t:"경제학과 조교수 초빙 (거시/계량)", org:"성균관대학교", f:["사회과학","경영·경제"], rank:"조교수", region:"서울", dl:"2026-09-15", pay:"본교 내규", sk:["계량경제","Stata","영어강의"], pf:["Top-tier 논문"]},
+ {id:20,t:"공공경제연구부 연구위원", org:"한국개발연구원(KDI)", f:["사회과학","경영·경제"], rank:"연구원", region:"세종", dl:"2026-08-31", pay:"기관 내규", sk:["계량경제","Stata","R"], pf:["정책보고서 작성"]},
+ {id:21,t:"심리학과 조교수 신규 임용 (인지심리)", org:"중앙대학교", f:["사회과학","심리학"], rank:"조교수", region:"서울", dl:"2026-08-22", pay:"본교 내규", sk:["실험설계","SPSS","R"], pf:["fMRI","영어강의"]},
+ {id:22,t:"도시사회연구실 부연구위원", org:"서울연구원", f:["사회과학","사회·행정"], rank:"연구원", region:"서울", dl:"2026-07-24", pay:"기관 내규", sk:["정책분석","GIS","SPSS"], pf:["질적연구"]},
+ {id:23,t:"국어국문학과 강의전담교수", org:"고려대학교", f:["인문학","어문학"], rank:"강의·겸임", region:"서울", dl:"2026-08-28", pay:"본교 내규", sk:["한국어교육","강의경력"], pf:["외국인 대상 강의"]},
+ {id:24,t:"철학과 조교수 초빙 (서양근대철학)", org:"서강대학교", f:["인문학","역사·철학"], rank:"조교수", region:"서울", dl:"2026-09-20", pay:"본교 내규", sk:["서양철학","영어강의"], pf:["학술서 번역"]},
+ {id:25,t:"디자인학부 조교수 (UX/인터랙션)", org:"홍익대학교", f:["예·체능","디자인"], rank:"조교수", region:"서울", dl:"2026-08-14", pay:"본교 내규", sk:["UX디자인","Figma"], pf:["프로토타이핑","HCI 논문"]},
+ {id:26,t:"체육학과 겸임교수 (스포츠과학)", org:"용인대학교", f:["예·체능","체육"], rank:"강의·겸임", region:"용인", dl:"2026-07-26", pay:"강의료 별도 책정", sk:["스포츠과학","실기지도"], pf:["현장 코칭 경력"]},
+ /* ↓ PDF 추출로 등록된 실제 공고 (서울시립대 공고 제2026-333호) */
+ {id:27,t:"환경원예학과 초빙교수 (도시정원)", org:"서울시립대학교", f:["자연과학","농림·원예"], rank:"초빙·객원", region:"서울", dl:"2026-07-15", pay:"본교 비전임교원 규정", sk:["도시정원","정책 수립·행정","공공기관 경력 20년+"], pf:[], isNew:true},
+ {id:28,t:"교통공학과 초빙교수 (교통공학 및 정책)", org:"서울시립대학교", f:["공학","토목·건축·도시"], rank:"초빙·객원", region:"서울", dl:"2026-07-15", pay:"본교 비전임교원 규정", sk:["교통공학","교통정책","공공기관 경력 15년+"], pf:[], isNew:true},
+ {id:29,t:"도시과학연구원 초빙교수 (행정)", org:"서울시립대학교", f:["사회과학","사회·행정"], rank:"초빙·객원", region:"서울", dl:"2026-07-15", pay:"본교 비전임교원 규정", sk:["행정","정책분석","공공기관 경력 25년+"], pf:[], isNew:true},
+ /* 융합·학제간 */
+ {id:30,t:"AI융합대학원 조교수 (AI+헬스케어)", org:"경희대학교", f:["융합·학제간","AI·데이터 융합"], rank:"조교수", region:"서울", dl:"2026-09-08", pay:"본교 내규", sk:["Python","Deep Learning","의료AI"], pf:["임상 협업 경험"]},
+ {id:31,t:"탄소중립융합연구소 연구교수", org:"UNIST", f:["융합·학제간","환경·지속가능"], rank:"연구교수", region:"울산", dl:"2026-08-26", pay:"연 6,200만 내외", sk:["에너지시스템","데이터분석"], pf:["정책연계 연구"]},
+ {id:32,t:"바이오헬스융합학부 조교수", org:"아주대학교", f:["융합·학제간","바이오헬스 융합"], rank:"조교수", region:"수원", dl:"2026-09-12", pay:"본교 내규", sk:["바이오인포매틱스","R"], pf:["의료데이터 분석"]},
+ /* ↓ 마감된 공고 — 삭제하지 않고 연도별 아카이브로 보존 */
+ {id:33,t:"통계학과 조교수 초빙 (데이터사이언스)", org:"고려대학교", f:["자연과학","수학·통계"], rank:"조교수", region:"서울", dl:"2025-11-28", pay:"본교 내규", sk:["Python","R","Machine Learning"], pf:["영어강의"]},
+ {id:34,t:"전기전자공학부 박사후연구원 (SoC 설계)", org:"KAIST", f:["공학","전기·전자"], rank:"박사후연구원", region:"대전", dl:"2025-08-14", pay:"연 5,200만", sk:["회로설계","Verilog"], pf:["테이프아웃 경험"]},
+ {id:35,t:"국어교육과 조교수 초빙", org:"부산대학교", f:["인문학","어문학"], rank:"조교수", region:"부산", dl:"2025-05-30", pay:"본교 내규", sk:["한국어교육","강의경력"], pf:["교재 개발"]},
+ {id:36,t:"화학과 박사후연구원 (촉매화학)", org:"POSTECH", f:["자연과학","화학"], rank:"박사후연구원", region:"포항", dl:"2024-12-06", pay:"연 4,900만", sk:["유기합성","촉매화학"], pf:["논문실적"]},
+ {id:37,t:"경영학부 조교수 초빙 (마케팅)", org:"연세대학교", f:["사회과학","경영·경제"], rank:"조교수", region:"서울", dl:"2024-09-20", pay:"본교 내규", sk:["마케팅","계량분석"], pf:["Top-tier 논문"]},
+ {id:38,t:"의공학연구소 연구원 (의료 AI)", org:"삼성서울병원", f:["의·약학","의학"], rank:"연구원", region:"서울", dl:"2024-06-28", pay:"병원 내규", sk:["의료AI","Python"], pf:["DICOM"]},
+];
+
+const isArchived = p => daysLeft(p.dl) < 0;
+const archYear = p => p.dl.slice(0,4);
+/* 아카이브: 드릴다운 방식 — 평소엔 노드 하나, 클릭하면 연도가,
+   연도를 클릭하면 그 해 공고가 있는 분야 노드가 펼쳐진다 */
+function treeWithArchive(){
+  const years = [...new Set(JOBS.filter(isArchived).map(archYear))].sort().reverse();
+  if(!years.length) return TREE;
+  const archNode = {name:"아카이브"};
+  if(state.expandedArch.has("아카이브")){
+    archNode.children = years.map(y=>{
+      const yn = {name: y+"년"};
+      if(state.expandedArch.has("아카이브/"+y+"년")){
+        yn.children = TREE.children.map(c=>c.name)
+          .filter(cat=>JOBS.some(p=>isArchived(p)&&archYear(p)===y&&p.f[0]===cat))
+          .map(cat=>({name:cat}));
+      }
+      return yn;
+    });
+  }
+  return {name:TREE.name, children:[...TREE.children, archNode]};
+}
+
+/* ── 상태 ────────────────────────────────────────────── */
+const state = {
+  sel:new Set(),           // 선택된 분야 경로들 — 다중 선택 (예: "공학/컴퓨터·AI", "융합·학제간")
+  inc:new Set(), exc:new Set(),
+  rank:"", q:"", sort:"deadline",
+  cmp:new Set(),           // 비교함 (최대 3)
+  collapsed:new Set(),
+  expandedArch:new Set(),  // 아카이브 드릴다운 상태 ("아카이브", "아카이브/2025년")
+};
+const MAX_CMP = 3;
+
+/* ── 유틸 ────────────────────────────────────────────── */
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function daysLeft(d){ return Math.ceil((new Date(d+"T23:59:59") - new Date())/86400000); }
+function ddayHtml(d){
+  const n = daysLeft(d);
+  if(n<0) return `<span class="dday arch">마감</span>`;
+  const cls = n<=7 ? "crit" : n<=21 ? "warn" : "";
+  return `<span class="dday ${cls}">D-${n}</span>`;
+}
+function allSk(p){ return p.sk.concat(p.pf); }
+
+/* 트리 외 필터(스킬·직급·검색) 통과 여부 — 트리 카운트에 사용 */
+function passesNonTree(p){
+  for(const s of state.inc) if(!allSk(p).includes(s)) return false;
+  for(const s of state.exc) if(p.sk.includes(s)) return false;   // 제외는 필수요건에만
+  if(state.rank && p.rank !== state.rank) return false;
+  if(state.q){
+    const q = state.q.toLowerCase();
+    const hay = (p.t+" "+p.org+" "+allSk(p).join(" ")).toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
+  return true;
+}
+function passesTree(p){
+  if(!state.sel.size) return !isArchived(p);             // 선택 없음 = 진행 중 전체
+  for(const k of state.sel){                             // 여러 분야·연도 OR 결합
+    const parts = k.split("/");
+    if(parts[0]==="아카이브"){                            // 아카이브: 연도 → 분야 드릴다운 필터
+      if(isArchived(p)
+         && (parts.length<2 || archYear(p)===parts[1].replace("년",""))
+         && (parts.length<3 || p.f[0]===parts[2])) return true;
+    } else {
+      if(!isArchived(p) && parts.every((s,i)=>p.f[i]===s)) return true;
+    }
+  }
+  return false;
+}
+function visibleJobs(){
+  let v = JOBS.filter(p=>passesNonTree(p)&&passesTree(p));
+  if(state.sort==="deadline") v.sort((a,b)=>daysLeft(a.dl)-daysLeft(b.dl));
+  else if(state.sort==="org") v.sort((a,b)=>a.org.localeCompare(b.org,"ko"));
+  else if(state.sort==="match"){
+    const m = p=>[...state.inc].filter(s=>allSk(p).includes(s)).length;
+    v.sort((a,b)=>m(b)-m(a)||daysLeft(a.dl)-daysLeft(b.dl));
+  }
+  return v;
+}
+
+/* ── 트리 렌더링 (SVG) ───────────────────────────────── */
+const measCtx = document.createElement("canvas").getContext("2d");
+function textW(s,font){ measCtx.font=font; return measCtx.measureText(s).width; }
+
+let lastSelKey = null;
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ── 노드 물리 상태: 스프링 이동 + 부유(idle float) + 드래그 ── */
+const phys = new Map();          // key -> {x,y,r, vx,vy,vr, tx,ty,tr(목표)}
+let treeRef = null, dragKey = null, didDrag = false;
+const h01 = s => { let h=0; for(const ch of s) h=(h*31+ch.charCodeAt(0))>>>0; return (h%997)/997; };
+
+function computeTree(){
+  const X=[40,158,296,416], ROW=34, PADY=24;
+  const nodes=[], links=[]; let leafY=0;
+  function walk(n, depth, path, color, parentKey){
+    const key = path.join("/");
+    const fieldPath = path.slice(1);
+    const fieldKey = fieldPath.join("/");
+    const isArchNode = fieldPath[0]==="아카이브";
+    const cnt = JOBS.filter(p=>{
+      if(!passesNonTree(p)) return false;
+      if(isArchNode) return isArchived(p)
+        && (fieldPath.length<2 || archYear(p)===fieldPath[1].replace("년",""))
+        && (fieldPath.length<3 || p.f[0]===fieldPath[2]);
+      return !isArchived(p) && fieldPath.every((s,i)=>p.f[i]===s);
+    }).length;
+    const sel = depth===0 ? state.sel.size===0 : state.sel.has(fieldKey);
+    const node = {n,depth,key,fieldKey,color,cnt,sel,x:X[Math.min(depth,3)],parentKey,isArchNode};
+    nodes.push(node);
+    const open = n.children && !state.collapsed.has(key);
+    if(open){
+      node.kids = n.children.map(c=>walk(c,depth+1,[...path,c.name], depth===0?BRANCH[c.name]:color, key));
+      node.y = (node.kids[0].y + node.kids[node.kids.length-1].y)/2;
+      node.kids.forEach(k=>links.push([node,k]));
+    } else { node.y = PADY + leafY*ROW; leafY++; }
+    node.open = open; node.hasKids = !!n.children;
+    const base = depth===0 ? 17 : depth===1 ? 13.5 : depth===2 ? 10.5 : 9.5;
+    node.r = (sel && depth>0) ? base*1.45 : base;        // 선택된 원은 더 크게
+    return node;
+  }
+  const root = treeWithArchive();
+  walk(root,0,[root.name],"#2C5E4F",null);
+  const W = nodes.some(n=>n.depth>=3) ? 560 : 440;       // 아카이브 드릴다운 시 가로 확장
+  return {nodes, links, W, H: PADY*2 + Math.max(leafY,1)*ROW + 14};
+}
+
+function renderTree(){
+  const {nodes, links, W, H} = computeTree();
+  const svg = $("#treeSvg");
+  const colors = [...new Set(nodes.map(n=>n.color))];
+  const gid = c => "bg"+colors.indexOf(c);
+  let out = "<defs>" + colors.map((c,i)=>
+    `<radialGradient id="bg${i}" cx="35%" cy="28%" r="85%">
+       <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/>
+       <stop offset="38%" stop-color="${c}" stop-opacity=".55"/>
+       <stop offset="100%" stop-color="${c}"/>
+     </radialGradient>`).join("") + "</defs>";
+
+  out += links.map(([a,b])=>
+    `<path class="tlink" data-a="${esc(a.key)}" data-b="${esc(b.key)}" fill="none" stroke="${b.color}" stroke-width="1.6" opacity=".45"/>`).join("");
+
+  for(const nd of nodes){
+    const c = nd.color, label = esc(nd.n.name);
+    out += `<g class="node ${nd.cnt===0&&!nd.sel?"dim":""}" data-key="${esc(nd.key)}" data-act="sel" transform="translate(${nd.x},${nd.y})">`;
+    out += `<circle class="ring" r="${nd.r+4.5}" fill="none" stroke="${c}" stroke-width="2.4" opacity="${nd.sel?.95:0}"/>`;
+    out += `<circle class="bubble" r="${nd.r}" fill="url(#${gid(c)})" stroke="${c}" stroke-width="1"/>`;
+    out += `<text class="bcnt" y="3.5" text-anchor="middle" font-size="${nd.depth===0?11.5:10.5}" font-weight="800" fill="#fff">${nd.cnt}</text>`;
+    // 라벨 색: 브랜치색을 잉크 쪽으로 섞어 두 테마 모두에서 대비 확보
+    const lblFill = ` style="fill:color-mix(in srgb, ${c} 72%, var(--ink))"`;
+    if(nd.depth<2 || (nd.hasKids && nd.open))            // 펼쳐진 부모는 라벨을 아래로 (링크와 겹침 방지)
+      out += `<text class="nlabel lb" y="${nd.r+16}" text-anchor="middle" font-size="13" font-weight="800"${nd.depth===0?` letter-spacing="1.2"`:""}${nd.depth>0?lblFill:""}>${label}</text>`;
+    else
+      out += `<text class="nlabel lr" x="${nd.r+8}" y="4.5" font-size="13" font-weight="${nd.sel?800:600}"${nd.sel?lblFill:""}>${label}</text>`;
+    if(nd.hasKids && nd.depth>0 && !nd.isArchNode)       // 아카이브는 노드 클릭이 곧 펼치기
+      out += `<g class="toggle" data-key="${esc(nd.key)}" data-act="tog" transform="translate(${nd.r*.85},${nd.r*.85})">
+        <circle r="6" fill="#fff" stroke="${c}" stroke-width="1.2"/>
+        <text y="3" text-anchor="middle" font-size="9.5" fill="${c}">${nd.open?"−":"+"}</text></g>`;
+    out += `</g>`;
+  }
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  svg.setAttribute("width",W); svg.setAttribute("height",H);
+  svg.innerHTML = out;
+
+  /* ── 물리 타깃 갱신: 새 레이아웃을 목표점으로, 실제 이동은 tick 루프의 스프링이 담당 ── */
+  const byKey = new Map(nodes.map(n=>[n.key,n]));
+  const els = new Map();
+  svg.querySelectorAll("g.node").forEach(g=>els.set(g.dataset.key,{
+    g, bubble:g.querySelector(".bubble"), ring:g.querySelector(".ring"),
+    label:g.querySelector(".nlabel"), tgl:g.querySelector(".toggle"),
+  }));
+  const linkEls = [...svg.querySelectorAll(".tlink")];
+
+  for(const nd of nodes){
+    let p = phys.get(nd.key);
+    if(!p){                                              // 새 노드는 부모 위치에서 자라나며 등장
+      const pp = nd.parentKey && phys.get(nd.parentKey);
+      p = {x: pp?pp.x:nd.x, y: pp?pp.y:nd.y, r:0, vx:0, vy:0, vr:0};
+      phys.set(nd.key, p);
+    }
+    p.tx = nd.x; p.ty = nd.y; p.tr = nd.r;
+  }
+  for(const key of [...phys.keys()]) if(!byKey.has(key)) phys.delete(key);
+  treeRef = {els, linkEls, W};
+  if(REDUCED){                                           // 동작 줄이기: 즉시 목표점으로
+    for(const p of phys.values()){ p.x=p.tx; p.y=p.ty; p.r=p.tr; }
+    drawFrame();
+  }
+}
+
+/* 현재 물리 상태를 SVG에 그리기 */
+function drawFrame(){
+  if(!treeRef) return;
+  for(const [key,e] of treeRef.els){
+    const p = phys.get(key); if(!p) continue;
+    const r = Math.max(0,p.r);
+    e.g.setAttribute("transform",`translate(${p.x},${p.y})`);
+    e.bubble.setAttribute("r",r);
+    e.ring.setAttribute("r",r+4.5);
+    if(e.label.classList.contains("lb")) e.label.setAttribute("y",r+16);
+    else e.label.setAttribute("x",r+8);
+    if(e.tgl) e.tgl.setAttribute("transform",`translate(${r*.85},${r*.85})`);
+  }
+  for(const el of treeRef.linkEls){
+    const a = phys.get(el.dataset.a), b = phys.get(el.dataset.b);
+    if(!a||!b) continue;
+    const ax=a.x+a.r+1, bx=b.x-b.r-1, mx=(ax+bx)/2;
+    el.setAttribute("d",`M${ax},${a.y} C${mx},${a.y} ${mx},${b.y} ${bx},${b.y}`);
+  }
+}
+
+/* 상시 물리 루프: 스프링으로 목표점 추적 — 가만히 있으면 정지, 호버하면 커짐 */
+let hoverKey = null;
+if(!REDUCED) requestAnimationFrame(function tick(){
+  for(const [key,p] of phys){
+    if(key !== dragKey){
+      p.vx = (p.vx + (p.tx-p.x)*0.09)*0.84;              // 스프링 + 감쇠 → 살짝 튕기는 탄력
+      p.vy = (p.vy + (p.ty-p.y)*0.09)*0.84;
+      p.x += p.vx; p.y += p.vy;
+    }
+    const targetR = p.tr * ((key===hoverKey || key===dragKey) ? 1.3 : 1);  // 호버·드래그 중 확대
+    p.vr = (p.vr + (targetR-p.r)*0.14)*0.76; p.r += p.vr;
+  }
+  drawFrame();
+  requestAnimationFrame(tick);
+});
+
+/* 호버: 올리면 자연스럽게 커지고, 그대로 잡아 끌 수 있음 */
+(function(){
+  const svg = $("#treeSvg");
+  const toSvg = e => new DOMPoint(e.clientX, e.clientY)
+                       .matrixTransform(svg.getScreenCTM().inverse());
+  let off = null, pid = null, captured = false;
+
+  svg.addEventListener("pointerover", e=>{
+    const g = e.target.closest("g.node");
+    if(g) hoverKey = g.dataset.key;
+  });
+  svg.addEventListener("pointerout", e=>{
+    const g = e.target.closest("g.node");
+    if(g && g.dataset.key === hoverKey && !dragKey) hoverKey = null;
+  });
+
+  svg.addEventListener("pointerdown", e=>{
+    didDrag = false; captured = false;                   // 새 제스처마다 초기화
+    const g = e.target.closest("g.node"); if(!g || REDUCED) return;
+    dragKey = g.dataset.key; pid = e.pointerId;
+    const p = phys.get(dragKey), pt = toSvg(e);
+    off = {dx: p.x-pt.x, dy: p.y-pt.y};
+    /* 주의: 여기서 바로 setPointerCapture 하면 click의 target이 svg로
+       재지정되어 노드 선택(클릭)이 전부 죽는다 — 실제 드래그 시작 후에만 캡처 */
+  });
+  svg.addEventListener("pointermove", e=>{
+    if(!dragKey) return;
+    const p = phys.get(dragKey), pt = toSvg(e);
+    const nx = pt.x+off.dx, ny = pt.y+off.dy;
+    if(!didDrag && Math.hypot(nx-p.tx, ny-p.ty) > 6){    // 6px 이상 끌면 드래그로 판별
+      didDrag = true;
+      if(!captured){ svg.setPointerCapture(pid); captured = true; }
+    }
+    if(didDrag){
+      p.vx = (nx-p.x)*.5; p.vy = (ny-p.y)*.5;            // 놓을 때 관성 유지
+      p.x = nx; p.y = ny;
+    }
+  });
+  const end = ()=>{ dragKey = null; hoverKey = null; captured = false; };
+  svg.addEventListener("pointerup", end);
+  svg.addEventListener("pointercancel", end);
+})();
+
+$("#treeSvg").addEventListener("click", e=>{
+  if(didDrag){ didDrag = false; return; }                // 드래그로 끝난 제스처는 선택 아님
+  const g = e.target.closest("[data-key]");
+  if(!g) return;
+  const key = g.dataset.key, act = g.dataset.act;
+  if(act==="tog"){
+    state.collapsed.has(key) ? state.collapsed.delete(key) : state.collapsed.add(key);
+  } else {
+    const fieldKey = key.split("/").slice(1).join("/");
+    if(!fieldKey){ state.sel.clear(); state.expandedArch.clear(); }  // 루트 = 전체 해제
+    else if(fieldKey.startsWith("아카이브")){
+      const parts = fieldKey.split("/");
+      if(parts.length===1){                              // ① 아카이브: 연도 펼치기/접기
+        if(state.expandedArch.has("아카이브")){
+          state.expandedArch.clear();
+          [...state.sel].forEach(k=>{ if(k.startsWith("아카이브")) state.sel.delete(k); });
+        } else {
+          state.expandedArch.add("아카이브");
+          state.sel.add("아카이브");
+        }
+      } else if(parts.length===2){                       // ② 연도: 분야 펼치기 + 연도 필터
+        if(state.expandedArch.has(fieldKey)){
+          state.expandedArch.delete(fieldKey);
+          [...state.sel].forEach(k=>{ if(k.startsWith(fieldKey)) state.sel.delete(k); });
+        } else {
+          state.expandedArch.add(fieldKey);
+          state.sel.delete("아카이브");                   // 드릴다운 = 상위 선택 대체
+          state.sel.add(fieldKey);
+        }
+      } else {                                           // ③ 연도/분야: 좁혀서 필터
+        if(state.sel.has(fieldKey)) state.sel.delete(fieldKey);
+        else {
+          state.sel.delete(parts.slice(0,2).join("/"));
+          state.sel.delete("아카이브");
+          state.sel.add(fieldKey);
+        }
+      }
+    }
+    else state.sel.has(fieldKey) ? state.sel.delete(fieldKey) : state.sel.add(fieldKey);
+    lastSelKey = key;
+  }
+  render();
+  if(act==="sel" && lastSelKey){                         // 선택한 원을 패널 가운데로
+    const p = phys.get(lastSelKey), sc = $("#treeScroll"), svg = $("#treeSvg");
+    if(p){
+      const W = treeRef?.W || 440;
+      const scale = (svg.clientWidth||W)/W;
+      sc.scrollTo({top: Math.max(0, p.ty*scale - sc.clientHeight/2), behavior: REDUCED?"auto":"smooth"});
+    }
+  }
+});
+
+/* ── 스킬 칩 ─────────────────────────────────────────── */
+function skillFreq(){
+  const m = new Map();
+  for(const p of JOBS) for(const s of allSk(p)) m.set(s,(m.get(s)||0)+1);
+  return [...m.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"ko"));
+}
+let SKILLS = skillFreq();
+
+function renderChips(){
+  $("#chipCloud").innerHTML = SKILLS.map(([s,c])=>{
+    const cls = state.inc.has(s)?"inc":state.exc.has(s)?"exc":"";
+    return `<button class="chip ${cls}" data-skill="${esc(s)}" aria-pressed="${cls?'true':'false'}">${esc(s)}<span class="cnt">${c}</span></button>`;
+  }).join("");
+}
+$("#chipCloud").addEventListener("click", e=>{
+  const b = e.target.closest("[data-skill]"); if(!b) return;
+  const s = b.dataset.skill;
+  if(state.inc.has(s)){ state.inc.delete(s); state.exc.add(s); }
+  else if(state.exc.has(s)){ state.exc.delete(s); }
+  else state.inc.add(s);
+  render();
+});
+
+/* ── 활성 필터 요약 ──────────────────────────────────── */
+function renderActive(n){
+  let h = `<span class="count"><b>${n}</b>건의 공고</span>`;
+  for(const k of state.sel)
+    h += `<span class="fchip path">${esc(k.split("/").join(" › "))}<button data-clear="selp" data-v="${esc(k)}" aria-label="분야 해제">✕</button></span>`;
+  for(const s of state.inc) h += `<span class="fchip inc">+ ${esc(s)}<button data-clear="inc" data-v="${esc(s)}" aria-label="포함 해제">✕</button></span>`;
+  for(const s of state.exc) h += `<span class="fchip exc">− ${esc(s)}<button data-clear="exc" data-v="${esc(s)}" aria-label="제외 해제">✕</button></span>`;
+  if(state.sel.size||state.inc.size||state.exc.size||state.rank||state.q)
+    h += `<button id="resetBtn">전체 초기화</button>`;
+  $("#activeBar").innerHTML = h;
+}
+$("#activeBar").addEventListener("click", e=>{
+  if(e.target.id==="resetBtn"){
+    state.sel.clear(); state.expandedArch.clear(); state.inc.clear(); state.exc.clear(); state.rank=""; state.q="";
+    $("#q").value=""; $("#rankSel").value=""; render(); return;
+  }
+  const b = e.target.closest("[data-clear]"); if(!b) return;
+  const k=b.dataset.clear, v=b.dataset.v;
+  if(k==="selp") state.sel.delete(v);
+  if(k==="inc") state.inc.delete(v);
+  if(k==="exc") state.exc.delete(v);
+  render();
+});
+
+/* ── 카드 ────────────────────────────────────────────── */
+function renderCards(list){
+  if(!list.length){
+    $("#cards").innerHTML = `<div class="empty">조건에 맞는 공고가 없습니다.<br>스킬 제외 조건이나 분야 선택을 조금 풀어 보세요.</div>`;
+    return;
+  }
+  $("#cards").innerHTML = list.map(p=>{
+    const c = BRANCH[p.f[0]];
+    const hit = s => state.inc.has(s) ? " hit" : "";
+    const skH = p.sk.map(s=>`<span class="sk${hit(s)}">${esc(s)}</span>`).join("");
+    const pfH = p.pf.length ? `<span class="sk-label">우대</span>`+p.pf.map(s=>`<span class="sk pref${hit(s)}">${esc(s)}</span>`).join("") : "";
+    const nInc = state.inc.size;
+    const m = nInc ? [...state.inc].filter(s=>allSk(p).includes(s)).length : 0;
+    const on = state.cmp.has(p.id);
+    const full = state.cmp.size>=MAX_CMP && !on;
+    const url = p.url || ORG_URL[p.org];
+    const arch = isArchived(p);
+    return `<article class="card ${arch?"archived":""}" style="--bc:${arch?"#8A8F94":c}">
+      <div class="card-top">
+        <div>
+          <h3>${url
+            ? `<a href="${esc(url)}" target="_blank" rel="noopener" title="공고 원문·기관 사이트로 이동">${esc(p.t)}<span class="ext">↗</span></a>`
+            : esc(p.t)}</h3>
+          <div class="meta"><b>${esc(p.org)}</b> · ${esc(p.region)} · ${esc(p.f.join(" › "))}</div>
+        </div>
+        <div class="badges">${p.isNew?'<span class="newpill">NEW</span>':""}<span class="rank">${esc(p.rank)}</span>${ddayHtml(p.dl)}</div>
+      </div>
+      <div class="skills">${skH}${pfH}</div>
+      <div class="card-foot">
+        <span class="salary">${esc(p.pay)} · ${arch ? p.dl.replaceAll("-",".")+" 마감" : "~"+p.dl.slice(5).replace("-",".")}</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          ${nInc?`<span class="match">스킬 매치 ${m}/${nInc}</span>`:""}
+          <label class="cmp-toggle ${on?"on":""}"><input type="checkbox" data-cmp="${p.id}" ${on?"checked":""} ${full?"disabled":""}>비교</label>
+        </span>
+      </div>
+    </article>`;
+  }).join("");
+}
+$("#cards").addEventListener("change", e=>{
+  const cb = e.target.closest("[data-cmp]"); if(!cb) return;
+  const id = +cb.dataset.cmp;
+  cb.checked ? state.cmp.add(id) : state.cmp.delete(id);
+  render();
+});
+
+/* ── 비교 트레이 & 오버레이 ──────────────────────────── */
+function renderTray(){
+  const tray = $("#tray");
+  if(!state.cmp.size){ tray.classList.remove("show"); return; }
+  tray.classList.add("show");
+  $("#trayItems").innerHTML = [...state.cmp].map(id=>{
+    const p = JOBS.find(j=>j.id===id);
+    return `<span class="titem">${esc(p.org)} · ${esc(p.rank)}<button data-un="${id}" aria-label="비교 제거">✕</button></span>`;
+  }).join("");
+  $("#cmpBtn").disabled = state.cmp.size<2;
+  $("#cmpBtn").textContent = `나란히 비교 (${state.cmp.size})`;
+}
+$("#trayItems").addEventListener("click", e=>{
+  const b=e.target.closest("[data-un]"); if(!b) return;
+  state.cmp.delete(+b.dataset.un); render();
+});
+$("#cmpBtn").addEventListener("click", ()=>{
+  const ps = [...state.cmp].map(id=>JOBS.find(j=>j.id===id));
+  const row = (th,cells)=>`<tr><th scope="row">${th}</th>${cells.map(c=>`<td>${c}</td>`).join("")}</tr>`;
+  let h = `<table><thead><tr><th></th>${ps.map(p=>
+      `<th>${esc(p.t)}<span class="org">${esc(p.org)}</span></th>`).join("")}</tr></thead><tbody>`;
+  h += row("분야", ps.map(p=>esc(p.f.join(" › "))));
+  h += row("직급", ps.map(p=>esc(p.rank)));
+  h += row("지역", ps.map(p=>esc(p.region)));
+  h += row("마감", ps.map(p=>`<span class="dd">D-${daysLeft(p.dl)}</span> (${p.dl})`));
+  h += row("대우", ps.map(p=>esc(p.pay)));
+  const uni = kind => [...new Set(ps.flatMap(p=>p[kind]))];
+  const matrix = (title,kind)=>{
+    let s = `<tr class="sec"><th>${title}</th>${ps.map(()=>"<td></td>").join("")}</tr>`;
+    for(const sk of uni(kind)){
+      const has = ps.map(p=>p[kind].includes(sk));
+      const common = kind==="sk" && has.every(Boolean);
+      s += `<tr class="${common?"common":""}"><th scope="row">${esc(sk)}</th>${
+        has.map(y=>`<td class="${y?"yes":"no"}"><span class="dot">${y?"●":"·"}</span></td>`).join("")}</tr>`;
+    }
+    return s;
+  };
+  h += matrix("필수 스킬","sk") + matrix("우대 사항","pf") + "</tbody></table>";
+  $("#cmpTable").innerHTML = h;
+  $("#overlay").classList.add("show");
+});
+$("#cmpClose").addEventListener("click", ()=>$("#overlay").classList.remove("show"));
+$("#overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") $("#overlay").classList.remove("show"); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#overlay").classList.remove("show"); $("#ingest").classList.remove("show"); } });
+
+/* ── 입력 컨트롤 ─────────────────────────────────────── */
+$("#q").addEventListener("input", e=>{ state.q=e.target.value.trim(); render(); });
+$("#rankSel").addEventListener("change", e=>{ state.rank=e.target.value; render(); });
+$("#sortSel").addEventListener("change", e=>{ state.sort=e.target.value; render(); });
+
+/* ── PDF 추출 데모 ───────────────────────────────────── */
+const EXTRACTED = [
+ {t:"컴퓨터공학과 조교수 초빙 (인공지능·데이터)", org:"한밭대학교", f:["공학","컴퓨터·AI"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["Python","Machine Learning"], pf:["영어강의"], conf:"high", ev:"모집분야: 컴퓨터공학과 — 인공지능·데이터 전공"},
+ {t:"수리과학과 조교수 초빙 (응용통계)", org:"한밭대학교", f:["자연과학","수학·통계"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["R","통계이론"], pf:["데이터사이언스 교과"], conf:"high", ev:"수리과학과 — 응용통계 전공"},
+ {t:"산업디자인학과 조교수 초빙 (제품디자인)", org:"한밭대학교", f:["예·체능","디자인"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["제품디자인"], pf:["산업체 경력"], conf:"med", ev:"산업디자인학과 — 제품디자인 전공 (융합 전공 여부 확인 필요)"},
+];
+let ingested = false, nextId = 100;
+
+$("#ingestBtn").addEventListener("click", ()=>{
+  $("#ingStep1").hidden = false; $("#ingStep2").hidden = true; $("#ingStep3").hidden = true;
+  $("#ingRun").disabled = ingested;
+  $("#ingDoneNote").hidden = !ingested;
+  $("#ingest").classList.add("show");
+});
+$("#ingClose").addEventListener("click", ()=>$("#ingest").classList.remove("show"));
+$("#ingest").addEventListener("click", e=>{ if(e.target.id==="ingest") $("#ingest").classList.remove("show"); });
+
+$("#ingRun").addEventListener("click", ()=>{
+  $("#ingStep1").hidden = true; $("#ingStep2").hidden = false;
+  setTimeout(()=>{
+    $("#ingResults").innerHTML = EXTRACTED.map(p=>{
+      const c = BRANCH[p.f[0]];
+      return `<div class="xcard">
+        <div class="xtop">
+          <div>
+            <h4>${esc(p.t)}</h4>
+            <div class="xmeta">${esc(p.org)} · ${esc(p.region)} · ${esc(p.rank)} · ~${p.dl} ·
+              필수: ${p.sk.map(esc).join(", ")} · 우대: ${p.pf.map(esc).join(", ")}</div>
+            <span class="xpath" style="background:${c}">${esc(p.f.join(" › "))}</span>
+          </div>
+          <span class="conf ${p.conf==="high"?"high":"med"}">${p.conf==="high"?"확신도 높음 · 자동 게시":"확신도 중간 · 검수 대기"}</span>
+        </div>
+        <div class="xmeta" style="margin-top:6px">분류 근거: “${esc(p.ev)}”</div>
+      </div>`;
+    }).join("");
+    $("#ingStep2").hidden = true; $("#ingStep3").hidden = false;
+  }, 1400);
+});
+
+$("#ingApprove").addEventListener("click", ()=>{
+  if(!ingested){
+    for(const p of EXTRACTED) JOBS.push({...p, id: nextId++, isNew:true});
+    SKILLS = skillFreq();
+    ingested = true;
+  }
+  $("#ingest").classList.remove("show");
+  state.sel.clear(); // 전체 보기로 돌아가 새 공고가 보이게
+  render();
+});
+
+/* ── 테마 전환 (시스템 설정 기본, 버튼으로 강제 전환) ── */
+(function(){
+  const root = document.documentElement, btn = $("#themeBtn");
+  const sysDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+  const store = {
+    get(){ try{ return localStorage.getItem("smartree-theme"); }catch(e){ return null; } },
+    set(v){ try{ localStorage.setItem("smartree-theme", v); }catch(e){} },
+  };
+  function apply(t){
+    if(t) root.dataset.theme = t; else delete root.dataset.theme;
+    const dark = t ? t==="dark" : sysDark();
+    btn.textContent = dark ? "☀️" : "🌙";
+    btn.title = dark ? "라이트 모드로 전환" : "다크 모드로 전환";
+  }
+  apply(store.get());
+  btn.addEventListener("click", ()=>{
+    const cur = root.dataset.theme || (sysDark() ? "dark" : "light");
+    const next = cur==="dark" ? "light" : "dark";
+    store.set(next); apply(next);
+  });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{ if(!root.dataset.theme) apply(null); });
+})();
+
+/* ── 전체 렌더 ───────────────────────────────────────── */
+function updateStats(){
+  $("#statTotal").textContent = JOBS.filter(p=>!isArchived(p)).length;
+  $("#statWeek").textContent = JOBS.filter(p=>{const n=daysLeft(p.dl); return n>=0&&n<=7;}).length;
+  $("#statArch").textContent = JOBS.filter(isArchived).length;
+}
+function render(){
+  const list = visibleJobs();
+  renderTree(); renderChips(); renderActive(list.length); renderCards(list); renderTray(); updateStats();
+}
+render();
+</script>
