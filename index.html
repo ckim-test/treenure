@@ -278,6 +278,18 @@
   .ing-primary{background:var(--accent);color:#fff;border:0;border-radius:8px;
                padding:10px 18px;font-size:13.5px;font-weight:700;width:100%}
   .ing-primary:disabled{opacity:.45;cursor:default}
+  #subForm{display:flex;flex-direction:column;gap:6px}
+  .flabel{font-size:12.5px;font-weight:700;margin-top:8px}
+  .flabel span{color:var(--sub);font-weight:400;font-size:11.5px}
+  .flabel .req{color:var(--exc);font-weight:700}
+  .finput{border:1px solid var(--line);border-radius:var(--radius-s);padding:9px 12px;
+          font-family:inherit;font-size:13.5px;background:var(--panel2);color:var(--ink);
+          transition:border-color .15s, box-shadow .15s}
+  .finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  #subForm .ing-primary{margin-top:14px}
+  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;z-index:70;
+         background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;
+         padding:12px 20px;border-radius:12px;box-shadow:var(--shadow-2)}
   #ingSpinner{text-align:center;padding:36px 0;color:var(--sub);font-size:13.5px}
   #ingSpinner .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
                    background:var(--accent);margin:0 3px;animation:blink 1s infinite}
@@ -394,42 +406,28 @@
   <div id="ingestBox">
     <button id="ingClose" aria-label="닫기">✕</button>
     <h2>PDF 공고 등록</h2>
-    <div class="steps"><b>1 업로드</b> → 2 자동 추출 → 3 검수·승인 <span style="opacity:.7">(데모 — 실서비스는 Claude API가 PDF를 구조화 추출)</span></div>
+    <div class="steps">공고문 PDF와 출처를 보내주시면 <b>검수 후 게시</b>됩니다 — 관리자에게 이메일로 전달돼요</div>
 
-    <div id="ingStep1">
-      <div class="pdfcard">
-        <span class="icon">📄</span>
-        <div>
-          <div class="name">한밭대학교_2026-2학기_전임교원_초빙공고.pdf</div>
-          <div class="meta">3쪽 · 842KB · 여러 분야 일괄 모집 공고</div>
-        </div>
-      </div>
-      <div class="pdf-excerpt">한밭대학교 공고 제2026-131호
-2026학년도 2학기 전임교원(조교수) 공개채용 공고
+    <form id="subForm" action="https://formsubmit.co/ylit777@gmail.com" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_subject" value="[smarTree] 새 공고 등록 요청">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://ckim-test.github.io/smarTree/?submitted=1">
 
-1. 모집분야
-  가. 컴퓨터공학과 — 인공지능·데이터 전공 1명 (Python, 기계학습 연구실적 필수 / 영어강의 가능자 우대)
-  나. 수리과학과 — 응용통계 전공 1명 (R 및 통계이론 강의 가능자 / 데이터사이언스 교과 개발 우대)
-  다. 산업디자인학과 — 제품디자인 전공 1명 (포트폴리오 제출 / 산업체 경력 우대)
-2. 지원자격: 박사학위 소지자 (임용일 기준)
-3. 접수기간: 2026. 7. 27.(월) ~ 8. 7.(금) 18:00 …</div>
-      <button class="ing-primary" id="ingRun">이 PDF에서 공고 추출하기</button>
-      <p class="ing-note" id="ingDoneNote" hidden>✓ 이 PDF는 이미 반영되었습니다. 목록에서 NEW 배지로 확인할 수 있어요.</p>
-    </div>
+      <label class="flabel" for="subFile">공고문 PDF 파일 <span>(10MB 이하 · 선택)</span></label>
+      <input class="finput" id="subFile" type="file" name="attachment" accept="application/pdf,.pdf">
 
-    <div id="ingStep2" hidden>
-      <div id="ingSpinner">
-        공고 단위 분리 · 분야 분류 · 스킬 태깅 중<br><br>
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-    </div>
+      <label class="flabel" for="subUrl">공고가 올라온 사이트 주소 <span class="req">*</span></label>
+      <input class="finput" id="subUrl" type="url" name="source_url" placeholder="https://  예: 대학 채용공고 페이지" required>
 
-    <div id="ingStep3" hidden>
-      <div id="ingResults"></div>
-      <p class="ing-note" style="margin-bottom:12px">신규 스킬 2개 감지: <b>Machine Learning, 제품디자인</b> — 승인 시 스킬 사전에 추가됩니다.
-      분류 확신도가 낮은 공고는 이렇게 검수 대기로 표시되고, 나머지는 자동 게시할 수 있습니다.</p>
-      <button class="ing-primary" id="ingApprove">3건 승인하고 트리에 반영</button>
-    </div>
+      <label class="flabel" for="subOrg">기관·학과 <span>(선택)</span></label>
+      <input class="finput" id="subOrg" type="text" name="org" placeholder="예: OO대학교 통계학과">
+
+      <label class="flabel" for="subNote">메모 <span>(선택)</span></label>
+      <textarea class="finput" id="subNote" name="note" rows="2" placeholder="마감일, 특이사항 등"></textarea>
+
+      <button class="ing-primary" type="submit">등록 요청 보내기</button>
+      <p class="ing-note">전송 시 스팸 방지 확인 화면이 잠깐 나타날 수 있습니다. 파일 없이 사이트 주소만 보내셔도 됩니다.</p>
+    </form>
   </div>
 </div>
 
@@ -978,55 +976,20 @@ $("#q").addEventListener("input", e=>{ state.q=e.target.value.trim(); render(); 
 $("#rankSel").addEventListener("change", e=>{ state.rank=e.target.value; render(); });
 $("#sortSel").addEventListener("change", e=>{ state.sort=e.target.value; render(); });
 
-/* ── PDF 추출 데모 ───────────────────────────────────── */
-const EXTRACTED = [
- {t:"컴퓨터공학과 조교수 초빙 (인공지능·데이터)", org:"한밭대학교", f:["공학","컴퓨터·AI"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["Python","Machine Learning"], pf:["영어강의"], conf:"high", ev:"모집분야: 컴퓨터공학과 — 인공지능·데이터 전공"},
- {t:"수리과학과 조교수 초빙 (응용통계)", org:"한밭대학교", f:["자연과학","수학·통계"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["R","통계이론"], pf:["데이터사이언스 교과"], conf:"high", ev:"수리과학과 — 응용통계 전공"},
- {t:"산업디자인학과 조교수 초빙 (제품디자인)", org:"한밭대학교", f:["예·체능","디자인"], rank:"조교수", region:"대전", dl:"2026-08-07", pay:"본교 내규", sk:["제품디자인"], pf:["산업체 경력"], conf:"med", ev:"산업디자인학과 — 제품디자인 전공 (융합 전공 여부 확인 필요)"},
-];
-let ingested = false, nextId = 100;
-
-$("#ingestBtn").addEventListener("click", ()=>{
-  $("#ingStep1").hidden = false; $("#ingStep2").hidden = true; $("#ingStep3").hidden = true;
-  $("#ingRun").disabled = ingested;
-  $("#ingDoneNote").hidden = !ingested;
-  $("#ingest").classList.add("show");
-});
+/* ── 공고 등록 요청 (제보 → 관리자 이메일) ─────────────── */
+$("#ingestBtn").addEventListener("click", ()=>$("#ingest").classList.add("show"));
 $("#ingClose").addEventListener("click", ()=>$("#ingest").classList.remove("show"));
 $("#ingest").addEventListener("click", e=>{ if(e.target.id==="ingest") $("#ingest").classList.remove("show"); });
 
-$("#ingRun").addEventListener("click", ()=>{
-  $("#ingStep1").hidden = true; $("#ingStep2").hidden = false;
-  setTimeout(()=>{
-    $("#ingResults").innerHTML = EXTRACTED.map(p=>{
-      const c = BRANCH[p.f[0]];
-      return `<div class="xcard">
-        <div class="xtop">
-          <div>
-            <h4>${esc(p.t)}</h4>
-            <div class="xmeta">${esc(p.org)} · ${esc(p.region)} · ${esc(p.rank)} · ~${p.dl} ·
-              필수: ${p.sk.map(esc).join(", ")} · 우대: ${p.pf.map(esc).join(", ")}</div>
-            <span class="xpath" style="background:${c}">${esc(p.f.join(" › "))}</span>
-          </div>
-          <span class="conf ${p.conf==="high"?"high":"med"}">${p.conf==="high"?"확신도 높음 · 자동 게시":"확신도 중간 · 검수 대기"}</span>
-        </div>
-        <div class="xmeta" style="margin-top:6px">분류 근거: “${esc(p.ev)}”</div>
-      </div>`;
-    }).join("");
-    $("#ingStep2").hidden = true; $("#ingStep3").hidden = false;
-  }, 1400);
-});
-
-$("#ingApprove").addEventListener("click", ()=>{
-  if(!ingested){
-    for(const p of EXTRACTED) JOBS.push({...p, id: nextId++, isNew:true});
-    SKILLS = skillFreq();
-    ingested = true;
-  }
-  $("#ingest").classList.remove("show");
-  state.sel.clear(); // 전체 보기로 돌아가 새 공고가 보이게
-  render();
-});
+/* 전송 완료 후 복귀(?submitted=1) 시 감사 토스트 */
+if(new URLSearchParams(location.search).has("submitted")){
+  const t = document.createElement("div");
+  t.id = "toast";
+  t.textContent = "✓ 등록 요청이 전송되었습니다. 검수 후 게시됩니다 — 감사합니다!";
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 6000);
+  history.replaceState(null, "", location.pathname);
+}
 
 /* ── 테마 전환 (시스템 설정 기본, 버튼으로 강제 전환) ── */
 (function(){
