@@ -414,9 +414,10 @@
     <h2>PDF 공고 등록</h2>
     <div class="steps">공고문 PDF와 출처를 보내주시면 <b>검수 후 게시</b>됩니다 — 관리자에게 이메일로 전달돼요</div>
 
-    <form id="subForm">
+    <form id="subForm" action="https://formsubmit.co/ylit777@gmail.com" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="_subject" value="[smarTree] 새 공고 등록 요청">
       <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://ckim-test.github.io/smarTree/?submitted=1">
 
       <label class="flabel" for="subFile">공고문 PDF 파일 <span>(10MB 이하 · 선택)</span></label>
       <input class="finput" id="subFile" type="file" name="attachment" accept="application/pdf,.pdf">
@@ -431,7 +432,7 @@
       <textarea class="finput" id="subNote" name="note" rows="2" placeholder="마감일, 특이사항 등"></textarea>
 
       <button class="ing-primary" type="submit">등록 요청 보내기</button>
-      <p class="ing-note">파일 없이 사이트 주소만 보내셔도 됩니다.</p>
+      <p class="ing-note">파일 없이 사이트 주소만 보내셔도 됩니다. PDF를 첨부한 경우 전송 시 스팸 방지 확인 화면이 한 번 나타납니다.</p>
       <div id="subFallback" hidden>
         ⚠️ 전송 서비스가 일시적으로 응답하지 않습니다.
         <a id="mailtoBtn" href="#">📧 이메일로 직접 보내기</a> — 메일 창이 열리면 공고문 PDF를 첨부해 주세요.
@@ -997,10 +998,18 @@ function showToast(msg){
   setTimeout(()=>t.remove(), 6000);
 }
 
-/* 전송: FormSubmit AJAX → 실패하면 이메일 직접 발송 폴백 제시 */
+/* 전송 완료 후 복귀(?submitted=1) 시 감사 토스트 — 첨부파일 경로(일반 전송)용 */
+if(new URLSearchParams(location.search).has("submitted")){
+  showToast("✓ 등록 요청이 전송되었습니다. 검수 후 게시됩니다 — 감사합니다!");
+  history.replaceState(null, "", location.pathname);
+}
+
+/* 전송: 파일이 있으면 일반 폼 전송(첨부는 AJAX 미지원), 없으면 AJAX → 실패 시 이메일 폴백 */
 $("#subForm").addEventListener("submit", async e=>{
+  const f0 = e.target;
+  if(f0.attachment.files.length > 0) return;   // 네이티브 전송 → 첨부 포함, _next로 복귀
   e.preventDefault();
-  const f = e.target, btn = f.querySelector(".ing-primary");
+  const f = f0, btn = f.querySelector(".ing-primary");
   btn.disabled = true; btn.textContent = "전송 중…";
   try{
     const res = await fetch("https://formsubmit.co/ajax/ylit777@gmail.com", {
