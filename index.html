@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Treenure — 학술채용 트리 탐색</title>
 <style>
@@ -96,6 +97,7 @@
   .wm-sub{font-size:9.5px;font-weight:700;letter-spacing:.22em;color:var(--sub);margin-top:4px}
   .tagline{color:var(--sub);font-size:13.5px}
   .hstats{margin-left:auto;display:flex;gap:16px;font-size:13px;color:var(--sub);align-items:center}
+  .hstats span{white-space:nowrap}
   .hstats b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:15px}
   #themeBtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
     background:var(--panel);font-size:15px;line-height:1;display:grid;place-items:center;
@@ -155,7 +157,7 @@
   #treeScroll{overflow:auto;max-height:calc(100vh - 240px);border-radius:10px;
               background-image:radial-gradient(var(--tree-dot) 1.1px, transparent 1.1px);
               background-size:20px 20px}   /* 도트 그리드 = 조작 가능한 캔버스라는 신호 */
-  #treeSvg{touch-action:none;width:100%;height:auto;display:block}
+  #treeSvg{touch-action:pan-y;width:100%;height:auto;display:block}
   #treeSvg text{font-family:var(--sans);user-select:none;-webkit-user-select:none}
   /* 라벨: 테마 대응 기본색 + 배경(도트 그리드) 위 가독성을 위한 헤일로 */
   #treeSvg .nlabel{fill:var(--ink);
@@ -358,11 +360,38 @@
     #hero{grid-template-columns:1fr;padding:44px 20px 32px;gap:16px}
     .hero-vert,.hero-art svg{display:none}
     .hero-stats{justify-content:flex-start;margin-top:18px}
-    main{grid-template-columns:1fr}
+    main{grid-template-columns:1fr;padding:16px 18px}
     #treePanel{position:static}
-    #treeScroll{max-height:340px}
-    header{padding:16px 18px}
-    main{padding:16px 18px}
+    #treeScroll{max-height:46vh}
+    header{padding:14px 18px}
+  }
+  /* ── 폰 (≤600px) ────────────────────── */
+  @media (max-width:600px){
+    header{gap:10px;padding:12px 14px}
+    .tagline{display:none}
+    .wordmark{font-size:24px}
+    .logomark{width:34px;height:34px}
+    #themeBtn{margin-left:auto}
+    .hstats{order:5;width:100%;margin-left:0;gap:12px;font-size:12.5px}
+    #hero{padding:36px 16px 26px}
+    #hero h1{font-size:clamp(28px,8.2vw,34px)}
+    .hero-desc{font-size:15px}
+    .hero-cta{flex-direction:column;align-items:stretch;gap:10px}
+    .btn-outline{width:100%;padding:15px 0;text-align:center}
+    .btn-ghost{text-align:center}
+    .hero-stats{gap:26px}
+    .hero-stats b{font-size:26px}
+    .deck-row select{flex:1}
+    .deck-row input[type=search],.deck-row select,.finput{font-size:16px} /* iOS 포커스 줌 방지 */
+    .chip{padding:7px 14px}                                              /* 터치 타깃 확대 */
+    .card{padding:15px 14px 13px 18px}
+    .card-top{flex-wrap:wrap}
+    .card-foot{flex-wrap:wrap;gap:8px}
+    #overlay,#ingest{padding:14px 10px}
+    #cmpBox,#ingestBox{padding:20px 16px}
+    #tray{padding:10px 12px;gap:8px}
+    #cmpBtn{padding:9px 14px;font-size:13.5px}
+    footer{flex-wrap:wrap;gap:8px 16px;padding:20px 16px 32px}
   }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
