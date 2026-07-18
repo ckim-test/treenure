@@ -142,7 +142,7 @@
   footer a:hover{color:var(--accent-ink);text-decoration:underline}
 
   /* ── layout ─────────────────────────── */
-  main{display:grid;grid-template-columns:minmax(360px,430px) 1fr;gap:24px;
+  main{display:grid;grid-template-columns:minmax(420px,560px) 1fr;gap:24px;
        padding:24px 28px;max-width:1440px;margin:0 auto}
   .panel{background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
          box-shadow:var(--shadow-1)}
@@ -152,10 +152,10 @@
   .panel-label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--sub);
                text-transform:uppercase;padding:0 8px 4px}
   .tree-hint{font-size:13px;color:var(--sub);padding:0 8px 10px;border-bottom:1px solid var(--line-soft);margin-bottom:6px}
-  #treeScroll{overflow:auto;max-height:calc(100vh - 270px);border-radius:10px;
+  #treeScroll{overflow:auto;max-height:calc(100vh - 240px);border-radius:10px;
               background-image:radial-gradient(var(--tree-dot) 1.1px, transparent 1.1px);
               background-size:20px 20px}   /* 도트 그리드 = 조작 가능한 캔버스라는 신호 */
-  #treeSvg{touch-action:none}
+  #treeSvg{touch-action:none;width:100%;height:auto;display:block}
   #treeSvg text{font-family:var(--sans);user-select:none;-webkit-user-select:none}
   /* 라벨: 테마 대응 기본색 + 배경(도트 그리드) 위 가독성을 위한 헤일로 */
   #treeSvg .nlabel{fill:var(--ink);
