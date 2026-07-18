@@ -1,4 +1,4 @@
-# 🌳 smarTree — Academic Job Tree
+# 🌳 Treenure — Tree × Tenure, 학술채용 트리 탐색
 
 분야의 가지를 따라 내려가면, 내 공고가 보입니다.
 
@@ -6,7 +6,7 @@
 사이트 프로토타입입니다. 하이브레인넷 등 기존 학술 채용 게시판의 목록 중심
 탐색을 벤치마킹하되, 분야 구조·스킬·시간(아카이브) 축을 시각적으로 재구성했습니다.
 
-**라이브 데모**: GitHub Pages 활성화 후 → `https://ckim-test.github.io/smarTree/`
+**라이브 데모**: GitHub Pages 활성화 후 → `https://ckim-test.github.io/treenure/`
 
 ## 주요 기능
 
@@ -33,7 +33,7 @@ python3 -m http.server   # http://localhost:8000
 ## 배포 (GitHub Pages)
 
 저장소 **Settings → Pages → Source: Deploy from a branch → `main` / `(root)`** 설정.
-1~2분 후 `https://<아이디>.github.io/smarTree/` 에서 접속 가능.
+1~2분 후 `https://<아이디>.github.io/treenure/` 에서 접속 가능.
 
 ## 구조
 

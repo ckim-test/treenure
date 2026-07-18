@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light dark">
-<title>smarTree — 학술채용 트리 탐색</title>
+<title>Treenure — 학술채용 트리 탐색</title>
 <style>
   :root{
     /* 수목원 라이트 — 브랜드 녹색 기운을 머금은 뉴트럴 3단(페이지→패널→인셋) */
@@ -81,7 +81,7 @@
   button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px}
 
-  /* ── header / smarTree 브랜드 (스티키 + 블러) ── */
+  /* ── header / Treenure 브랜드 (스티키 + 블러) ── */
   header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;
          padding:16px 28px 14px;border-bottom:1px solid var(--line-soft);
          background:var(--header-bg);
@@ -93,7 +93,7 @@
   .wordmark{font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--ink)}
   .wordmark .wm-tree{background:linear-gradient(135deg,var(--wm-g1) 0%,var(--wm-g2) 100%);
                      -webkit-background-clip:text;background-clip:text;color:transparent}
-  .wm-sub{font-size:9.5px;font-weight:700;letter-spacing:.34em;color:var(--sub);margin-top:4px}
+  .wm-sub{font-size:9.5px;font-weight:700;letter-spacing:.22em;color:var(--sub);margin-top:4px}
   .tagline{color:var(--sub);font-size:13px}
   .hstats{margin-left:auto;display:flex;gap:16px;font-size:12.5px;color:var(--sub);align-items:center}
   .hstats b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px}
@@ -344,11 +344,11 @@
       <circle cx="33" cy="34" r="5.5" fill="url(#lgB)"/>
     </svg>
     <div>
-      <div class="wordmark">smar<span class="wm-tree">Tree</span></div>
-      <div class="wm-sub">ACADEMIC JOB TREE</div>
+      <div class="wordmark"><span class="wm-tree">Tree</span>nure</div>
+      <div class="wm-sub">GROW YOUR ACADEMIC CAREER</div>
     </div>
   </div>
-  <div class="tagline">분야의 가지를 따라 내려가면, 내 공고가 보입니다</div>
+  <div class="tagline">가지를 따라 오르면, 테뉴어에 닿습니다 🌳</div>
   <div class="hstats">
     <span>진행 중 <b id="statTotal">0</b>건</span>
     <span>이번 주 마감 <b id="statWeek">0</b>건</span>
@@ -415,9 +415,9 @@
     <div class="steps">공고문 PDF와 출처를 보내주시면 <b>검수 후 게시</b>됩니다 — 관리자에게 이메일로 전달돼요</div>
 
     <form id="subForm" action="https://formsubmit.co/ylit777@gmail.com" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_subject" value="[smarTree] 새 공고 등록 요청">
+      <input type="hidden" name="_subject" value="[Treenure] 새 공고 등록 요청">
       <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_next" value="https://ckim-test.github.io/smarTree/?submitted=1">
+      <input type="hidden" name="_next" value="https://ckim-test.github.io/treenure/?submitted=1">
 
       <label class="flabel" for="subFile">공고문 PDF 파일 <span>(10MB 이하 · 선택)</span></label>
       <input class="finput" id="subFile" type="file" name="attachment" accept="application/pdf,.pdf">
@@ -1024,7 +1024,7 @@ $("#subForm").addEventListener("submit", async e=>{
     // 중계 서비스 장애 시: 입력값을 담은 메일 초안으로 우회
     const body = `공고 사이트: ${f.source_url.value}\n기관·학과: ${f.org.value}\n메모: ${f.note.value}\n\n(공고문 PDF가 있다면 이 메일에 첨부해 주세요)`;
     $("#mailtoBtn").href = "mailto:ylit777@gmail.com"
-      + "?subject=" + encodeURIComponent("[smarTree] 새 공고 등록 요청")
+      + "?subject=" + encodeURIComponent("[Treenure] 새 공고 등록 요청")
       + "&body=" + encodeURIComponent(body);
     $("#subFallback").hidden = false;
   }finally{
@@ -1037,8 +1037,8 @@ $("#subForm").addEventListener("submit", async e=>{
   const root = document.documentElement, btn = $("#themeBtn");
   const sysDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
   const store = {
-    get(){ try{ return localStorage.getItem("smartree-theme"); }catch(e){ return null; } },
-    set(v){ try{ localStorage.setItem("smartree-theme", v); }catch(e){} },
+    get(){ try{ return localStorage.getItem("treenure-theme"); }catch(e){ return null; } },
+    set(v){ try{ localStorage.setItem("treenure-theme", v); }catch(e){} },
   };
   function apply(t){
     if(t) root.dataset.theme = t; else delete root.dataset.theme;
