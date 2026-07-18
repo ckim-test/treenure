@@ -102,6 +102,45 @@
     cursor:pointer;transition:transform .18s ease}
   #themeBtn:hover{transform:rotate(20deg) scale(1.1)}
 
+  /* ── 에디토리얼 히어로 ──────────────── */
+  #hero{display:grid;grid-template-columns:110px 1.15fr 1fr;gap:24px;align-items:center;
+        max-width:1440px;margin:0 auto;padding:76px 28px 60px;position:relative}
+  .hero-vert{writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:800;
+             letter-spacing:.55em;color:var(--sub);opacity:.5;justify-self:center;user-select:none}
+  .hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.3em;color:var(--accent);margin-bottom:18px}
+  #hero h1{font-family:var(--serif);font-size:clamp(34px,4.6vw,56px);line-height:1.24;font-weight:800;
+           letter-spacing:-.015em;text-wrap:balance;color:var(--ink)}
+  #hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--wm-g1),var(--wm-g2));
+              -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-rule{width:64px;height:2px;background:var(--accent);margin:26px 0 20px}
+  .hero-desc{font-size:15px;color:var(--sub);max-width:46ch;line-height:1.85}
+  .hero-cta{display:flex;gap:14px;margin-top:32px;align-items:center}
+  .btn-outline{background:transparent;border:1.5px solid var(--ink);color:var(--ink);
+               padding:13px 32px;font-size:12px;font-weight:700;letter-spacing:.22em;cursor:pointer;
+               font-family:inherit;transition:background .18s,color .18s,transform .18s}
+  .btn-outline:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+  .btn-ghost{background:transparent;border:0;color:var(--sub);font-size:12px;font-weight:700;
+             letter-spacing:.18em;cursor:pointer;font-family:inherit;padding:13px 8px}
+  .btn-ghost:hover{color:var(--accent-ink);text-decoration:underline}
+  .hero-art{justify-self:center;text-align:center}
+  .hero-stats{display:flex;gap:36px;justify-content:center;margin-top:10px}
+  .hero-stats b{display:block;font-size:31px;font-weight:800;font-variant-numeric:tabular-nums;
+                color:var(--ink);line-height:1.15}
+  .hero-stats span{font-size:9.5px;font-weight:700;letter-spacing:.18em;color:var(--sub)}
+  /* 코너 도트 액센트 (레퍼런스의 dot grid) */
+  body::before, body::after{content:"";position:fixed;width:230px;height:180px;z-index:-1;
+    pointer-events:none;background-image:radial-gradient(var(--tree-dot) 1.3px, transparent 1.3px);
+    background-size:16px 16px}
+  body::before{top:92px;right:20px}
+  body::after{bottom:20px;left:20px}
+  /* 푸터 */
+  footer{max-width:1440px;margin:28px auto 0;padding:26px 28px 42px;display:flex;gap:20px;
+         align-items:center;border-top:1px solid var(--line-soft);color:var(--sub);
+         font-size:11px;letter-spacing:.16em;font-weight:600}
+  footer .sp{margin-left:auto}
+  footer a{color:var(--sub);text-decoration:none}
+  footer a:hover{color:var(--accent-ink);text-decoration:underline}
+
   /* ── layout ─────────────────────────── */
   main{display:grid;grid-template-columns:minmax(360px,430px) 1fr;gap:24px;
        padding:24px 28px;max-width:1440px;margin:0 auto}
@@ -316,6 +355,9 @@
   @media (prefers-reduced-motion:reduce){ #ingSpinner .dot{animation:none;opacity:.6} }
 
   @media (max-width:920px){
+    #hero{grid-template-columns:1fr;padding:44px 20px 32px;gap:16px}
+    .hero-vert,.hero-art svg{display:none}
+    .hero-stats{justify-content:flex-start;margin-top:18px}
     main{grid-template-columns:1fr}
     #treePanel{position:static}
     #treeScroll{max-height:340px}
@@ -358,6 +400,57 @@
   </div>
 </header>
 
+<section id="hero">
+  <span class="hero-vert">TREE&nbsp;×&nbsp;TENURE</span>
+  <div class="hero-main">
+    <p class="hero-eyebrow">ACADEMIC JOB TREE — SINCE 2026</p>
+    <h1>가지를 따라 오르면,<br><em>테뉴어</em>에 닿습니다</h1>
+    <div class="hero-rule"></div>
+    <p class="hero-desc">전국 대학·연구기관의 채용 공고를 분야의 나무로 한눈에.
+      스킬로 거르고, 나란히 비교하고, 지난 공고는 연도별 아카이브에서 돌아보세요.</p>
+    <div class="hero-cta">
+      <button class="btn-outline" id="heroExplore">공고 탐색</button>
+      <button class="btn-ghost" id="heroSubmit">공고 제보하기 ↗</button>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <svg width="300" height="230" viewBox="0 0 300 230">
+      <defs>
+        <radialGradient id="hg0" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#2C5E4F"/></radialGradient>
+        <radialGradient id="hg1" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#3E6FC4"/></radialGradient>
+        <radialGradient id="hg2" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#7A5BC9"/></radialGradient>
+        <radialGradient id="hg3" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#C9556E"/></radialGradient>
+        <radialGradient id="hg4" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#C98A2E"/></radialGradient>
+        <radialGradient id="hg5" cx="35%" cy="28%" r="85%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#2E8F94"/></radialGradient>
+      </defs>
+      <g fill="none" stroke-width="1.8" opacity=".4" stroke-linecap="round">
+        <path d="M44,115 C110,115 120,34 196,30"  stroke="#3E6FC4"/>
+        <path d="M44,115 C120,115 130,74 214,72"  stroke="#7A5BC9"/>
+        <path d="M44,115 C126,115 136,115 236,114" stroke="#C9556E"/>
+        <path d="M44,115 C120,115 130,156 214,158" stroke="#C98A2E"/>
+        <path d="M44,115 C110,115 120,196 196,200" stroke="#2E8F94"/>
+      </g>
+      <circle cx="40" cy="115" r="26" fill="url(#hg0)"/>
+      <circle cx="204" cy="30"  r="13" fill="url(#hg1)"/>
+      <circle cx="224" cy="72"  r="10" fill="url(#hg2)"/>
+      <circle cx="248" cy="114" r="15" fill="url(#hg3)"/>
+      <circle cx="224" cy="158" r="10" fill="url(#hg4)"/>
+      <circle cx="204" cy="200" r="12" fill="url(#hg5)"/>
+    </svg>
+    <div class="hero-stats">
+      <div><b id="heroActive">0</b><span>OPEN</span></div>
+      <div><b id="heroWeek">0</b><span>CLOSING SOON</span></div>
+      <div><b id="heroArch">0</b><span>ARCHIVE</span></div>
+    </div>
+  </div>
+</section>
+
 <main>
   <aside class="panel" id="treePanel">
     <div class="panel-label">분야 트리</div>
@@ -391,6 +484,13 @@
     <div id="cards"></div>
   </section>
 </main>
+
+<footer>
+  <span>TREENURE © 2026</span>
+  <span>GROW YOUR ACADEMIC CAREER</span>
+  <span class="sp"></span>
+  <a href="https://github.com/ckim-test/treenure" target="_blank" rel="noopener">GITHUB ↗</a>
+</footer>
 
 <div id="tray" aria-live="polite">
   <span class="tlabel">비교함</span>
@@ -1057,10 +1157,17 @@ $("#subForm").addEventListener("submit", async e=>{
 
 /* ── 전체 렌더 ───────────────────────────────────────── */
 function updateStats(){
-  $("#statTotal").textContent = JOBS.filter(p=>!isArchived(p)).length;
-  $("#statWeek").textContent = JOBS.filter(p=>{const n=daysLeft(p.dl); return n>=0&&n<=7;}).length;
-  $("#statArch").textContent = JOBS.filter(isArchived).length;
+  const act = JOBS.filter(p=>!isArchived(p)).length;
+  const wk  = JOBS.filter(p=>{const n=daysLeft(p.dl); return n>=0&&n<=7;}).length;
+  const arc = JOBS.filter(isArchived).length;
+  $("#statTotal").textContent = act; $("#statWeek").textContent = wk; $("#statArch").textContent = arc;
+  $("#heroActive").textContent = act; $("#heroWeek").textContent = wk; $("#heroArch").textContent = arc;
 }
+
+/* 히어로 CTA */
+$("#heroExplore").addEventListener("click", ()=>
+  $("#treePanel").scrollIntoView({behavior: REDUCED?"auto":"smooth", block:"start"}));
+$("#heroSubmit").addEventListener("click", ()=>$("#ingest").classList.add("show"));
 function render(){
   const list = visibleJobs();
   renderTree(); renderChips(); renderActive(list.length); renderCards(list); renderTray(); updateStats();
